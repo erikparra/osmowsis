@@ -1,9 +1,12 @@
 package com.osmowsis;
 
+import java.util.HashMap;
+import java.util.Map;
+
 enum LawnState {
-    GRASS,
-    CRATER,
-    MOWER,
-    EMPTY,
-    FENCE
+    grass,
+    crater,
+    mower,
+    empty,
+    fence
 }
