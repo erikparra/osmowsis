@@ -14,6 +14,9 @@ public class Main {
             //loan simulation file
             sim.loadStartingFile(args[0]);
 
+            sim.print();
+
+/*
             //run turns on simulatin
             while( sim.hasTurn() ) {
                 sim.pollMowerForAction();
@@ -32,6 +35,7 @@ public class Main {
                     e.printStackTrace();
                 }
             }
+   */
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.osmowsis;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.HashMap;
 import java.util.Random;
@@ -7,7 +8,12 @@ import java.io.*;
 
 public class Simulation {
 
-    public Lawn lawn;
+    private Lawn lawn;
+    private ArrayList<LawnMower> mowers;
+    private int maxTurns;
+
+
+
 
 
 
@@ -20,8 +26,6 @@ public class Simulation {
     private Integer lawnHeight;
     private Integer lawnWidth;
     private Integer[][] lawnInfo;
-    private Integer mowerX, mowerY;
-    private String mowerDirection;
     private HashMap<String, Integer> xDIR_MAP;
     private HashMap<String, Integer> yDIR_MAP;
 
@@ -38,12 +42,8 @@ public class Simulation {
     public Simulation() {
         randGenerator = new Random();
 
-        lawnHeight = 0;
-        lawnWidth = 0;
-        lawnInfo = new Integer[DEFAULT_WIDTH][DEFAULT_HEIGHT];
-        mowerX = -1;
-        mowerY = -1;
-        mowerDirection = "North";
+        mowers = new ArrayList<LawnMower>();
+
 
         xDIR_MAP = new HashMap<>();
         xDIR_MAP.put("North", 0);
@@ -79,98 +79,58 @@ public class Simulation {
 
             int width, height;
             // read in the lawn information
-            tokens = takeCommand.nextLine().split(DELIMITER);
+            tokens = scanner.nextLine().split(DELIMITER);
             width = Integer.parseInt(tokens[0]);
-            tokens = takeCommand.nextLine().split(DELIMITER);
+            tokens = scanner.nextLine().split(DELIMITER);
             height = Integer.parseInt(tokens[0]);
 
             lawn = new Lawn( width, height );
 
-
-
             // read in the lawnmower starting information
-            tokens = takeCommand.nextLine().split(DELIMITER);
+            tokens = scanner.nextLine().split(DELIMITER);
             int numMowers = Integer.parseInt(tokens[0]);
-            for (k = 0; k < numMowers; k++) {
-                tokens = takeCommand.nextLine().split(DELIMITER);
-                mowerX = Integer.parseInt(tokens[0]);
-                mowerY = Integer.parseInt(tokens[1]);
-                mowerDirection = tokens[2];
+            for (int i = 0; i < numMowers; i++) {
+                tokens = scanner.nextLine().split(DELIMITER);
+                int mowerX = Integer.parseInt(tokens[0]);
+                int mowerY = Integer.parseInt(tokens[1]);
+                String mowerDirection = tokens[2];
 
-                // mow the grass at the initial location
-                lawnInfo[mowerX][mowerY] = EMPTY_CODE;
+                lawn.addMower( mowerX, mowerY, i );
+                mowers.add( new LawnMower( i, Direction.valueOf(mowerDirection) ) );
             }
+
 
             // read in the crater information
-            tokens = takeCommand.nextLine().split(DELIMITER);
+            tokens = scanner.nextLine().split(DELIMITER);
             int numCraters = Integer.parseInt(tokens[0]);
-            for (k = 0; k < numCraters; k++) {
-                tokens = takeCommand.nextLine().split(DELIMITER);
+            for (int i = 0; i < numCraters; i++) {
+                tokens = scanner.nextLine().split(DELIMITER);
 
                 // place a crater at the given location
-                lawnInfo[Integer.parseInt(tokens[0])][Integer.parseInt(tokens[1])] = CRATER_CODE;
+                int craterX = Integer.parseInt(tokens[0]);
+                int craterY = Integer.parseInt(tokens[1]);
+                lawn.addCrater(craterX, craterY);
             }
 
-            takeCommand.close();
+            // read in number of turns
+            tokens = scanner.nextLine().split(DELIMITER);
+            maxTurns = Integer.parseInt(tokens[0]);
+
+            scanner.close();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println();
         }
     }
 
+    public void print(){
+        lawn.print();
 
-    public void uploadStartingFile(String testFileName) {
-        final String DELIMITER = ",";
-
-        try {
-            Scanner takeCommand = new Scanner(new File(testFileName));
-            String[] tokens;
-            int i, j, k;
-
-            // read in the lawn information
-            tokens = takeCommand.nextLine().split(DELIMITER);
-            lawnWidth = Integer.parseInt(tokens[0]);
-            tokens = takeCommand.nextLine().split(DELIMITER);
-            lawnHeight = Integer.parseInt(tokens[0]);
-
-            // generate the lawn information
-            lawnInfo = new Integer[lawnWidth][lawnHeight];
-            for (i = 0; i < lawnWidth; i++) {
-                for (j = 0; j < lawnHeight; j++) {
-                    lawnInfo[i][j] = GRASS_CODE;
-                }
-            }
-
-            // read in the lawnmower starting information
-            tokens = takeCommand.nextLine().split(DELIMITER);
-            int numMowers = Integer.parseInt(tokens[0]);
-            for (k = 0; k < numMowers; k++) {
-                tokens = takeCommand.nextLine().split(DELIMITER);
-                mowerX = Integer.parseInt(tokens[0]);
-                mowerY = Integer.parseInt(tokens[1]);
-                mowerDirection = tokens[2];
-
-                // mow the grass at the initial location
-                lawnInfo[mowerX][mowerY] = EMPTY_CODE;
-            }
-
-            // read in the crater information
-            tokens = takeCommand.nextLine().split(DELIMITER);
-            int numCraters = Integer.parseInt(tokens[0]);
-            for (k = 0; k < numCraters; k++) {
-                tokens = takeCommand.nextLine().split(DELIMITER);
-
-                // place a crater at the given location
-                lawnInfo[Integer.parseInt(tokens[0])][Integer.parseInt(tokens[1])] = CRATER_CODE;
-            }
-
-            takeCommand.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println();
-        }
+        System.out.println("Max Turns: " + maxTurns);
     }
 
+
+    /*
     public void pollMowerForAction() {
         int moveRandomChoice;
 
@@ -345,5 +305,6 @@ public class Simulation {
         System.out.println("dir: " + mowerDirection);
         System.out.println("");
     }
+    */
 
 }
