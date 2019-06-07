@@ -16,26 +16,12 @@ public class Main {
 
             sim.print();
 
-/*
-            //run turns on simulatin
+
+            //run turns on simulation
             while( sim.hasTurn() ) {
-                sim.pollMowerForAction();
-                sim.validateMowerAction();
-                sim.displayActionAndResponses();
-
-                //TODO: comment out the rendering before submission
-                sim.renderLawn();
-
-                // pause after each event for a given number of seconds
-                // pause is completely optional
-                try {
-                    Thread.sleep(5000);
-                }
-                catch(InterruptedException e) {
-                    e.printStackTrace();
-                }
+                sim.takeTurn();
             }
-   */
+
         }
     }
 }

@@ -8,66 +8,23 @@ import java.io.*;
 
 public class Simulation {
 
+    private static final int DEFAULT_MAX_SIZE = 100;
+
     private Lawn lawn;
     private ArrayList<LawnMower> mowers;
     private int maxTurns;
+    private int numOfTurns;
 
-
-
-
-
-
-
-    private static Random randGenerator;
-
-    private static final int DEFAULT_WIDTH = 100;
-    private static final int DEFAULT_HEIGHT = 100;
-
-    private Integer lawnHeight;
-    private Integer lawnWidth;
-    private Integer[][] lawnInfo;
-    private HashMap<String, Integer> xDIR_MAP;
-    private HashMap<String, Integer> yDIR_MAP;
-
-    private String trackAction;
-    private Integer trackMoveDistance;
-    private String trackNewDirection;
-    private String trackMoveCheck;
-    private String trackScanResults;
-
-    private final int EMPTY_CODE = 0;
-    private final int GRASS_CODE = 1;
-    private final int CRATER_CODE = 2;
 
     public Simulation() {
-        randGenerator = new Random();
-
         mowers = new ArrayList<LawnMower>();
-
-
-        xDIR_MAP = new HashMap<>();
-        xDIR_MAP.put("North", 0);
-        xDIR_MAP.put("Northeast", 1);
-        xDIR_MAP.put("East", 1);
-        xDIR_MAP.put("Southeast", 1);
-        xDIR_MAP.put("South", 0);
-        xDIR_MAP.put("Southwest", -1);
-        xDIR_MAP.put("West", -1);
-        xDIR_MAP.put("Northwest", -1);
-
-        yDIR_MAP = new HashMap<>();
-        yDIR_MAP.put("North", 1);
-        yDIR_MAP.put("Northeast", 1);
-        yDIR_MAP.put("East", 0);
-        yDIR_MAP.put("Southeast", -1);
-        yDIR_MAP.put("South", -1);
-        yDIR_MAP.put("Southwest", -1);
-        yDIR_MAP.put("West", 0);
-        yDIR_MAP.put("Northwest", 1);
+        numOfTurns = 0;
     }
 
     public boolean hasTurn(){
-        return true;
+        //todo: check for turns
+        //todo: check for mowers still running
+        return (maxTurns - numOfTurns > 0);
     }
 
     public void loadStartingFile(String testFileName) {
@@ -83,6 +40,9 @@ public class Simulation {
             width = Integer.parseInt(tokens[0]);
             tokens = scanner.nextLine().split(DELIMITER);
             height = Integer.parseInt(tokens[0]);
+
+            width = ( width <= 100 ) ? width : DEFAULT_MAX_SIZE;
+            height = ( height <= 100 ) ? height : DEFAULT_MAX_SIZE;
 
             lawn = new Lawn( width, height );
 
@@ -116,6 +76,9 @@ public class Simulation {
             tokens = scanner.nextLine().split(DELIMITER);
             maxTurns = Integer.parseInt(tokens[0]);
 
+            //set lawn number of grass
+            lawn.setNumOfGrass();
+
             scanner.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -124,13 +87,30 @@ public class Simulation {
     }
 
     public void print(){
-        lawn.print();
-
         System.out.println("Max Turns: " + maxTurns);
+        lawn.renderLawn();
     }
 
+    public void takeTurn(){
 
-    /*
+        //todo: for each mower
+        //todo: get action
+        //todo: validate action
+        //todo: display action/resonse
+        //todo: increase turn count
+        //sim.pollMowerForAction();
+        //sim.validateMowerAction();
+        //sim.displayActionAndResponses();
+
+        for(LawnMower mower : mowers) {
+            System.out.println("Turn: " + numOfTurns + ", Mower: " + mower.getId() );
+        }
+
+        numOfTurns++;
+
+    }
+
+/*
     public void pollMowerForAction() {
         int moveRandomChoice;
 
@@ -248,63 +228,6 @@ public class Simulation {
         }
     }
 
-    private void renderHorizontalBar(int size) {
-        System.out.print(" ");
-        for (int k = 0; k < size; k++) {
-            System.out.print("-");
-        }
-        System.out.println("");
-    }
-
-    public void renderLawn() {
-        int i, j;
-        int charWidth = 2 * lawnWidth + 2;
-
-        // display the rows of the lawn from top to bottom
-        for (j = lawnHeight - 1; j >= 0; j--) {
-            renderHorizontalBar(charWidth);
-
-            // display the Y-direction identifier
-            System.out.print(j);
-
-            // display the contents of each square on this row
-            for (i = 0; i < lawnWidth; i++) {
-                System.out.print("|");
-
-                // the mower overrides all other contents
-                if (i == mowerX & j == mowerY) {
-                    System.out.print("M");
-                } else {
-                    switch (lawnInfo[i][j]) {
-                        case EMPTY_CODE:
-                            System.out.print(" ");
-                            break;
-                        case GRASS_CODE:
-                            System.out.print("g");
-                            break;
-                        case CRATER_CODE:
-                            System.out.print("c");
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-            System.out.println("|");
-        }
-        renderHorizontalBar(charWidth);
-
-        // display the column X-direction identifiers
-        System.out.print(" ");
-        for (i = 0; i < lawnWidth; i++) {
-            System.out.print(" " + i);
-        }
-        System.out.println("");
-
-        // display the mower's direction
-        System.out.println("dir: " + mowerDirection);
-        System.out.println("");
-    }
-    */
+*/
 
 }

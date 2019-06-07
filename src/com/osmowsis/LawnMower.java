@@ -19,4 +19,16 @@ public class LawnMower {
         this.currentLocation = new Point(0, 0);
         this.knownlawn.put(currentLocation, LawnState.empty);
     }
+
+    public Direction getDirection(){
+        return this.direction;
+    }
+
+    public Boolean getIsCrashed(){
+        return this.isCrashed;
+    }
+
+    public int getId(){
+        return this.id;
+    }
 }
