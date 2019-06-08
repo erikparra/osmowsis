@@ -101,16 +101,13 @@ public class Simulation {
     }
 
     public void print(){
-        System.out.println("Max Turns: " + maxTurns);
         lawn.renderLawn();
     }
 
     public void takeTurn(){
 
-        //todo: for each mower
-        //todo: get action from mower
-            // mower will handle move in self lawn
-        //todo: validate action
+
+
             // apply action to lawn model
             //     AND validate action (ok/crash)
             //     if crash set mower status to crash
@@ -120,19 +117,27 @@ public class Simulation {
         //sim.validateMowerAction();
         //sim.displayActionAndResponses();
 
+        //todo: for each mower
         for(LawnMower mower : mowers) {
+
+            //todo: get action from mower
             Action action = mower.getAction();
             String simulationResponse = "";
+
+            //todo: validate action
             if( action.getState() == ActionState.scan ){
                 simulationResponse = sendScanToMower( mower );
             }
             else{
-                simulationResponse = "pending...";
+                //todo: set action in lawn model
+                simulationResponse = lawn.mowerMove( mower, action);
+                simulationResponse = "response ok/crash unknown";
             }
             System.out.println( action.toString() );
             System.out.println( simulationResponse );
         }
 
+        print();
         numOfTurns++;
     }
 

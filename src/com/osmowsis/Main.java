@@ -13,9 +13,7 @@ public class Main {
 
             //loan simulation file
             sim.loadStartingFile(args[0]);
-
             sim.print();
-
 
             //run turns on simulation
             while( sim.hasTurn() ) {

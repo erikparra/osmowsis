@@ -45,18 +45,23 @@ public class LawnMower {
             return null;
         }
 
-        //first move is scan
+        //first move is always scan
         if( knownlawn.size() == 1 ){
             return new Action(ActionState.scan);
         }
         else{
-            return new Action(ActionState.move, 0, Direction.northeast);
+
+            // todo: scan current direction
+            Action mowerAction = scanCurrentDirection();
+            if( mowerAction == null ){
+                return new Action(ActionState.move, 0, Direction.northeast);
+            }
+            else{
+                return mowerAction;
+            }
         }
-
-
-        //scan square around, then move
-
     }
+
 
     public void setScan( String scanResults ){
         String[] values = scanResults.split(",");
@@ -94,5 +99,111 @@ public class LawnMower {
         return false;
     }
 
+    /**
+     * return the state at the lawn location
+     *    or null if not found
+     */
+    private LawnState checkLocation( Point p ){
+        if( knownlawn.containsKey( p ) ){
+            return knownlawn.get( p );
+        }
+        else{
+            return null;
+        }
+    }
+
+    /**
+     * Return action if current direction has grass
+     *   AND set current direction to empty
+     * ELSE return null
+     */
+    private Action scanCurrentDirection(){
+        Point newPoint;
+        LawnState lawnState;
+        switch ( direction ){
+            case north:
+                newPoint = new Point(currentLocation.x, currentLocation.y+1);
+                lawnState = checkLocation( newPoint );
+                if( lawnState == LawnState.grass ){
+                    knownlawn.put(newPoint, LawnState.empty);
+                    return new Action(ActionState.move, 1, this.direction);
+                }
+                else{
+                    return null;
+                }
+            case northeast:
+                newPoint = new Point(currentLocation.x+1, currentLocation.y+1);
+                lawnState = checkLocation( newPoint );
+                if( lawnState == LawnState.grass ){
+                    knownlawn.put(newPoint, LawnState.empty);
+                    return new Action(ActionState.move, 1, this.direction);
+                }
+                else{
+                    return null;
+                }
+            case east:
+                newPoint = new Point(currentLocation.x+1, currentLocation.y);
+                lawnState = checkLocation( newPoint );
+                if( lawnState == LawnState.grass ){
+                    knownlawn.put(newPoint, LawnState.empty);
+                    return new Action(ActionState.move, 1, this.direction);
+                }
+                else{
+                    return null;
+                }
+            case southeast:
+                newPoint = new Point(currentLocation.x+1, currentLocation.y-1);
+                lawnState = checkLocation( newPoint );
+                if( lawnState == LawnState.grass ){
+                    knownlawn.put(newPoint, LawnState.empty);
+                    return new Action(ActionState.move, 1, this.direction);
+                }
+                else{
+                    return null;
+                }
+            case south:
+                newPoint = new Point(currentLocation.x, currentLocation.y-1);
+                lawnState = checkLocation( newPoint );
+                if( lawnState == LawnState.grass ){
+                    knownlawn.put(newPoint, LawnState.empty);
+                    return new Action(ActionState.move, 1, this.direction);
+                }
+                else{
+                    return null;
+                }
+            case southwest:
+                newPoint = new Point(currentLocation.x-1, currentLocation.y-1);
+                lawnState = checkLocation( newPoint );
+                if( lawnState == LawnState.grass ){
+                    knownlawn.put(newPoint, LawnState.empty);
+                    return new Action(ActionState.move, 1, this.direction);
+                }
+                else{
+                    return null;
+                }
+            case west:
+                newPoint = new Point(currentLocation.x-1, currentLocation.y);
+                lawnState = checkLocation( newPoint );
+                if( lawnState == LawnState.grass ){
+                    knownlawn.put(newPoint, LawnState.empty);
+                    return new Action(ActionState.move, 1, this.direction);
+                }
+                else{
+                    return null;
+                }
+            case northwest:
+                newPoint = new Point(currentLocation.x-1, currentLocation.y+1);
+                lawnState = checkLocation( newPoint );
+                if( lawnState == LawnState.grass ){
+                    knownlawn.put(newPoint, LawnState.empty);
+                    return new Action(ActionState.move, 1, this.direction);
+                }
+                else{
+                    return null;
+                }
+            default:
+                return null;
+        }
+    }
 
 }
