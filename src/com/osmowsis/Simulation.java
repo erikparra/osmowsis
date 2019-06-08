@@ -21,10 +21,24 @@ public class Simulation {
         numOfTurns = 0;
     }
 
+    /**
+     * Checks if there are turns left ( maxTurns - numOfTurns > 0)
+     * AND checks that there is atleast 1 lawnmower active (mower.state == running)
+     */
     public boolean hasTurn(){
-        //todo: check for turns
-        //todo: check for mowers still running
-        return (maxTurns - numOfTurns > 0);
+        boolean hasTurn = false;
+        if( maxTurns - numOfTurns > 0 ){
+            int runningCount = 0;
+            for(LawnMower mower : mowers) {
+                if( mower.getState() == MowerState.running )
+                    runningCount++;
+            }
+
+            if( runningCount > 0 ){
+                hasTurn = true;
+            }
+        }
+        return hasTurn;
     }
 
     public void loadStartingFile(String testFileName) {
@@ -94,8 +108,12 @@ public class Simulation {
     public void takeTurn(){
 
         //todo: for each mower
-        //todo: get action
+        //todo: get action from mower
+            // mower will handle move in self lawn
         //todo: validate action
+            // apply action to lawn model
+            //     AND validate action (ok/crash)
+            //     if crash set mower status to crash
         //todo: display action/resonse
         //todo: increase turn count
         //sim.pollMowerForAction();
@@ -103,11 +121,25 @@ public class Simulation {
         //sim.displayActionAndResponses();
 
         for(LawnMower mower : mowers) {
-            System.out.println("Turn: " + numOfTurns + ", Mower: " + mower.getId() );
+            Action action = mower.getAction();
+            String simulationResponse = "";
+            if( action.getState() == ActionState.scan ){
+                simulationResponse = sendScanToMower( mower );
+            }
+            else{
+                simulationResponse = "pending...";
+            }
+            System.out.println( action.toString() );
+            System.out.println( simulationResponse );
         }
 
         numOfTurns++;
+    }
 
+    private String sendScanToMower(LawnMower mower){
+        String scanResults = lawn.getScan( mower );
+        mower.setScan( scanResults );
+        return scanResults;
     }
 
 /*

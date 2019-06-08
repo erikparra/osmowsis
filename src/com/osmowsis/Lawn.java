@@ -74,4 +74,57 @@ public class Lawn {
 
     }
 
+    /**
+     * Find the position of the lawn mower
+     * build the scan string
+     */
+    public String getScan( LawnMower mower ){
+        //find lm position,
+        //build scan string
+        //lm.setScan( data string )
+        int x = -1;
+        int y = -1;
+        String scanResults = "";
+
+        for( int posX = 0; posX < lawn.length; posX++ ){
+            for( int posY = 0; posY < lawn[0].length; posY++ ){
+                if( lawn[posX][posY].getState() == LawnState.mower ){
+                    LawnSquareMower mowerSquare = (LawnSquareMower) lawn[posX][posY];
+                    if( mowerSquare.getId() == mower.getId() ){
+                        x = posX;
+                        y = posY;
+                        break;
+                    }
+                }
+            }
+        }
+
+        //north
+        scanResults += lawn[x][y+1].getState().toString() + ",";
+
+        //northeast
+        scanResults += lawn[x+1][y+1].getState().toString() + ",";
+
+        //east
+        scanResults += lawn[x+1][y].getState().toString() + ",";
+
+        //southeast
+        scanResults += lawn[x+1][y-1].getState().toString() + ",";
+
+        //south
+        scanResults += lawn[x][y-1].getState().toString() + ",";
+
+        //southwest
+        scanResults += lawn[x-1][y-1].getState().toString() + ",";
+
+        //west
+        scanResults += lawn[x-1][y].getState().toString() + ",";
+
+        //northwest
+        scanResults += lawn[x-1][y+1].getState().toString();
+
+        return scanResults;
+
+    }
+
 }
