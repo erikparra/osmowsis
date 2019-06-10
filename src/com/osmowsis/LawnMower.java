@@ -148,13 +148,31 @@ public class LawnMower {
             }
         }
 
+        //if all spaces around mower are id and blocking
+        //  find direction of grass or missing spaces
+        //  shutdown if all spaces are found.
+        if( surroundingSpacesScanned() ){
+            //FIND new direction towared missing grass or spaces
+            return new Action(ActionState.scan);
+        }
+        else{
+            return new Action(ActionState.scan);
+        }
 
+    }
 
-        // all spaces around mower are empty,
-        // find direction of grass in known state
-        // or shut off because grass is complete
-
-        System.out.println("Spaces around mower are empty, find direction toward grass");
-        return new Action(ActionState.scan);
+    /**
+     * Verify all spaces around the mower have been scanned
+     *
+     * @return boolean true if all are identified
+     */
+    private boolean surroundingSpacesScanned(){
+        for( Direction d : Direction.values() ){
+            LawnState lawnState = checkLocation( new Point( currentLocation, d) );
+            if(lawnState == null ){
+                return false;
+            }
+        }
+        return true;
     }
 }
