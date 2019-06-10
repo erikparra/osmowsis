@@ -2,7 +2,8 @@ package com.osmowsis;
 
 import com.osmowsis.*;
 
-import java.util.HashMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class LawnMower {
 
@@ -89,7 +90,43 @@ public class LawnMower {
      * Verify there is a square of fence
      */
     private boolean isLawnComplete() {
+        // sort to get bottom left corner
+        LinkedHashMap<Point, LawnState> sortedLowest = knownlawn.entrySet().stream()
+                .sorted( (p1, p2) ->{
+                    if( p1.getKey().x == p2.getKey().x ){
+                        return p1.getKey().y - p2.getKey().y;
+                    }
+                    else{
+                        return p1.getKey().x - p2.getKey().x;
+                    }
+                })
+                .collect( Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) ->oldValue, LinkedHashMap::new));
+
+        LinkedHashMap<Point, LawnState> sortedHighest = knownlawn.entrySet().stream()
+                .sorted( (p1, p2) ->{
+                    if( p1.getKey().x == p2.getKey().x ){
+                        return p2.getKey().y - p1.getKey().y;
+                    }
+                    else{
+                        return p2.getKey().x - p1.getKey().x;
+                    }
+                })
+                .collect( Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) ->oldValue, LinkedHashMap::new));
+
+        Point bottomLeft = sortedLowest.entrySet().stream().findFirst().get().getKey();
+        Point topRight = sortedHighest.entrySet().stream().findFirst().get().getKey();
+
+        //System.out.println("Sorted Map: " + sortedLowest);
+        //System.out.println("First : "+ sortedLowest.entrySet().stream().findFirst().toString() );
+
+        //System.out.println("Sorted Map: " + sortedHighest);
+        //System.out.println("First : "+ sortedHighest.entrySet().stream().findFirst().toString() );
+
         return false;
+
+
     }
 
     /**
@@ -152,6 +189,43 @@ public class LawnMower {
         //  find direction of grass or missing spaces
         //  shutdown if all spaces are found.
         if( surroundingSpacesScanned() ){
+
+            // sort to get bottom left corner
+            LinkedHashMap<Point, LawnState> sortedLowest = knownlawn.entrySet().stream()
+                    .sorted( (p1, p2) ->{
+                        if( p1.getKey().x == p2.getKey().x ){
+                            return p1.getKey().y - p2.getKey().y;
+                        }
+                        else{
+                            return p1.getKey().x - p2.getKey().x;
+                        }
+                    })
+                    .collect( Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                            (oldValue, newValue) ->oldValue, LinkedHashMap::new));
+
+            LinkedHashMap<Point, LawnState> sortedHighest = knownlawn.entrySet().stream()
+                    .sorted( (p1, p2) ->{
+                        if( p1.getKey().x == p2.getKey().x ){
+                            return p2.getKey().y - p1.getKey().y;
+                        }
+                        else{
+                            return p2.getKey().x - p1.getKey().x;
+                        }
+                    })
+                    .collect( Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                            (oldValue, newValue) ->oldValue, LinkedHashMap::new));
+
+            Point bottomLeft = sortedLowest.entrySet().stream().findFirst().get().getKey();
+            Point topRight = sortedHighest.entrySet().stream().findFirst().get().getKey();
+
+            System.out.println("Sorted Map: " + sortedLowest);
+            System.out.println("First : "+ sortedLowest.entrySet().stream().findFirst().toString() );
+
+            System.out.println("Sorted Map: " + sortedHighest);
+            System.out.println("First : "+ sortedHighest.entrySet().stream().findFirst().toString() );
+
+
+
             //FIND new direction towared missing grass or spaces
             return new Action(ActionState.scan);
         }
