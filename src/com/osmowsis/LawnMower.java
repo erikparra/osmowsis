@@ -54,15 +54,13 @@ public class LawnMower {
 
             // todo: scan current direction
             Action mowerAction = moveCurrentDirection();
-
-            if( mowerAction.getState() == ActionState.crash ){
-                return getNewDirection();
-            }
-            else if( mowerAction.getState() == ActionState.unknown ){
-                return new Action(ActionState.scan);
-            }
-            else{
-                return mowerAction;
+            switch( mowerAction.getState() ){
+                case crash:
+                    return getNewDirection();
+                case unknown:
+                    return new Action(ActionState.scan);
+                default:
+                    return mowerAction;
             }
         }
     }
@@ -99,10 +97,22 @@ public class LawnMower {
         }
     }
 
-    private Action moveCurrentDirectionAction( Point p, LawnState ls ){
-        switch (ls) {
+
+    /**
+     * Return action if current direction has grass
+     * AND set current direction to empty
+     * ELSE return null
+     */
+    private Action moveCurrentDirection() {
+        Point newPoint = new Point( currentLocation, direction);
+        LawnState lawnState = checkLocation( newPoint );
+        if( lawnState == null ){
+            return new Action(ActionState.unknown);
+        }
+        switch ( lawnState ) {
             case grass:
-                knownlawn.put(p, LawnState.empty);
+                knownlawn.put(newPoint, LawnState.empty);
+                currentLocation = newPoint;
                 return new Action(ActionState.move, 1, this.direction);
             case crater:
             case fence:
@@ -115,25 +125,12 @@ public class LawnMower {
 
 
     /**
-     * Return action if current direction has grass
-     * AND set current direction to empty
-     * ELSE return null
-     */
-    private Action moveCurrentDirection() {
-        Point newPoint = new Point( currentLocation, direction);
-        LawnState lawnState = checkLocation( newPoint );
-        return moveCurrentDirectionAction( newPoint, lawnState );
-    }
-
-
-    /**
      * Will scan the known areas around the mower and return the new direction it should travel, moving clockwise
      *
      * @return Action(move, 0, new_direction)
      */
     private Action getNewDirection() {
         //System.out.println("getNewDirection - Direction Length: " + Direction.values().length);
-        Point newPoint;
         LawnState lawnState;
         for( Direction d : Direction.values() ){
             lawnState = checkLocation( new Point( currentLocation, d) );
