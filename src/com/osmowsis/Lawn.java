@@ -81,29 +81,38 @@ public class Lawn {
 
         //todo: if scan outisde boundry, return fence state
 
+
+        Point p = new Point(loc.x, loc.y+1 );
         //north
-        scanResults += lawn[loc.x][loc.y+1].getState().toString() + ",";
+        scanResults += checkLocation(p).toString() + ",";
 
         //northeast
-        scanResults += lawn[loc.x+1][loc.y+1].getState().toString() + ",";
+        p = new Point(loc.x+1, loc.y+1 );
+        scanResults += checkLocation(p).toString() + ",";
 
         //east
-        scanResults += lawn[loc.x+1][loc.y].getState().toString() + ",";
+        p = new Point(loc.x+1, loc.y );
+        scanResults += checkLocation(p).toString() + ",";
 
         //southeast
-        scanResults += lawn[loc.x+1][loc.y-1].getState().toString() + ",";
+        p = new Point(loc.x+1, loc.y-1 );
+        scanResults += checkLocation(p).toString() + ",";
 
         //south
-        scanResults += lawn[loc.x][loc.y-1].getState().toString() + ",";
+        p = new Point(loc.x, loc.y-1 );
+        scanResults += checkLocation(p).toString() + ",";
 
         //southwest
-        scanResults += lawn[loc.x-1][loc.y-1].getState().toString() + ",";
+        p = new Point(loc.x-1, loc.y-1 );
+        scanResults += checkLocation(p).toString() + ",";
 
         //west
-        scanResults += lawn[loc.x-1][loc.y].getState().toString() + ",";
+        p = new Point(loc.x-1, loc.y );
+        scanResults += checkLocation(p).toString() + ",";
 
         //northwest
-        scanResults += lawn[loc.x - 1][loc.y + 1].getState().toString();
+        p = new Point(loc.x-1, loc.y );
+        scanResults += checkLocation(p).toString() + ",";
 
         return scanResults;
 
@@ -254,7 +263,15 @@ public class Lawn {
      * return the state at the lawn location
      */
     private LawnState checkLocation( Point p ){
-        return lawn[p.x][p.y].getState();
+        if( p.x >= this.width || p.x < 0 ){
+            return LawnState.fence;
+        }
+        else if( p.y >= this.height ||p.y < 0 ){
+            return LawnState.fence;
+        }
+        else{
+            return lawn[p.x][p.y].getState();
+        }
     }
 
 
