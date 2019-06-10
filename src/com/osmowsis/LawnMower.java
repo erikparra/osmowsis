@@ -52,9 +52,12 @@ public class LawnMower {
         else{
 
             // todo: scan current direction
-            Action mowerAction = scanCurrentDirection();
+            Action mowerAction = moveCurrentDirection();
+
+            // todo: find new direction
             if( mowerAction == null ){
-                return new Action(ActionState.move, 0, Direction.northeast);
+
+                return getNewDirection();
             }
             else{
                 return mowerAction;
@@ -117,7 +120,7 @@ public class LawnMower {
      *   AND set current direction to empty
      * ELSE return null
      */
-    private Action scanCurrentDirection(){
+    private Action moveCurrentDirection(){
         Point newPoint;
         LawnState lawnState;
         switch ( direction ){
@@ -206,4 +209,10 @@ public class LawnMower {
         }
     }
 
+
+    private Action getNewDirection(){
+        System.out.println("Direction Length: "+ Direction.values().length);
+
+        return new Action(ActionState.scan);
+    }
 }

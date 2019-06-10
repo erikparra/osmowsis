@@ -79,6 +79,8 @@ public class Lawn {
         String scanResults = "";
         Point loc = findMower( mower );
 
+        //todo: if scan outisde boundry, return fence state
+
         //north
         scanResults += lawn[loc.x][loc.y+1].getState().toString() + ",";
 
@@ -110,132 +112,142 @@ public class Lawn {
     /**
      *
      */
-    public String mowerMove(LawnMower mower, Action action) {
-
-        // get direction
-        // check num spaces for collisoin
-        // apply changes to model
-        // return status of/crash
+    public String moveMower(LawnMower mower, Action action) {
         //todo: check direction move for collision
-        Point pos = findMower(mower);
+        Point originalPos = findMower(mower);
+        Point currentPos = originalPos;
         switch (mower.getDirection()) {
             case north:
                 //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
-                    Point nextPos = new Point( pos.x, pos.y + i);
-                    LawnState nextState = checkLocation( nextPos );
+                    Point nextPos = new Point(currentPos.x, currentPos.y + i);
+                    LawnState nextState = checkLocation(nextPos);
                     if (nextState == LawnState.mower ||
                             nextState == LawnState.crater ||
                             nextState == LawnState.fence) {
                         return "crash";
                     } else {
-                        lawn[pos.x][pos.y] = new LawnSquare(LawnState.empty);
-                        lawn[nextPos.x][nextPos.y + i] = new LawnSquareMower(LawnState.mower, mower.getId());
-                        pos = nextPos;
+                        lawn[currentPos.x][currentPos.y] = new LawnSquare(LawnState.empty);
+                        lawn[nextPos.x][nextPos.y] = new LawnSquareMower(LawnState.mower, mower.getId());
+                        currentPos = nextPos;
                     }
                 }
                 return "ok";
             case northeast:
                 //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
-                    Point nextPos = new Point( pos.x, pos.y + i);
-                    LawnState nextState = checkLocation( nextPos );
+                    Point nextPos = new Point(currentPos.x + i, currentPos.y + i);
+                    LawnState nextState = checkLocation(nextPos);
                     if (nextState == LawnState.mower ||
                             nextState == LawnState.crater ||
                             nextState == LawnState.fence) {
                         return "crash";
                     } else {
-                        lawn[pos.x][pos.y] = new LawnSquare(LawnState.empty);
-                        lawn[nextPos.x][nextPos.y + i] = new LawnSquareMower(LawnState.mower, mower.getId());
-                        pos = nextPos;
+                        lawn[currentPos.x][currentPos.y] = new LawnSquare(LawnState.empty);
+                        lawn[nextPos.x][nextPos.y] = new LawnSquareMower(LawnState.mower, mower.getId());
+                        currentPos = nextPos;
                     }
                 }
                 return "ok";
             case east:
+                //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
-                    //todo: check step != mower,crater,fence,
-                    LawnState nextState = checkLocation(pos.x + i, pos.y);
+                    Point nextPos = new Point(currentPos.x + i, currentPos.y);
+                    LawnState nextState = checkLocation(nextPos);
                     if (nextState == LawnState.mower ||
                             nextState == LawnState.crater ||
                             nextState == LawnState.fence) {
                         return "crash";
                     } else {
-                        lawn[pos.x][pos.y] = new LawnSquare(LawnState.empty);
-                        lawn[pos.x + i][pos.y] = new LawnSquareMower(LawnState.mower, mower.getId());
-                        pos = new Point(pos.x + i, pos.y);
+                        lawn[currentPos.x][currentPos.y] = new LawnSquare(LawnState.empty);
+                        lawn[nextPos.x][nextPos.y] = new LawnSquareMower(LawnState.mower, mower.getId());
+                        currentPos = nextPos;
                     }
                 }
                 return "ok";
             case southeast:
+                //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
-                    //todo: check step != mower,crater,fence,
-                    LawnState nextState = checkLocation(pos.x + i, pos.y - i);
+                    Point nextPos = new Point(currentPos.x + 1, currentPos.y - i);
+                    LawnState nextState = checkLocation(nextPos);
                     if (nextState == LawnState.mower ||
                             nextState == LawnState.crater ||
                             nextState == LawnState.fence) {
                         return "crash";
                     } else {
-                        lawn[pos.x][pos.y] = new LawnSquare(LawnState.empty);
-                        lawn[pos.x + i][pos.y - i] = new LawnSquareMower(LawnState.mower, mower.getId());
-                        pos = new Point(pos.x + i, pos.y - i);
+                        lawn[currentPos.x][currentPos.y] = new LawnSquare(LawnState.empty);
+                        lawn[nextPos.x][nextPos.y] = new LawnSquareMower(LawnState.mower, mower.getId());
+                        currentPos = nextPos;
                     }
                 }
                 return "ok";
             case south:
+                //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
-                    //todo: check step != mower,crater,fence,
-                    LawnState nextState = checkLocation(pos.x, pos.y - i);
+                    Point nextPos = new Point(currentPos.x, currentPos.y - i);
+                    LawnState nextState = checkLocation(nextPos);
                     if (nextState == LawnState.mower ||
                             nextState == LawnState.crater ||
                             nextState == LawnState.fence) {
                         return "crash";
                     } else {
-                        lawn[pos.x][pos.y] = new LawnSquare(LawnState.empty);
-                        lawn[pos.x][pos.y - i] = new LawnSquareMower(LawnState.mower, mower.getId());
-                        pos = new Point(pos.x, pos.y - i);
+                        lawn[currentPos.x][currentPos.y] = new LawnSquare(LawnState.empty);
+                        lawn[nextPos.x][nextPos.y] = new LawnSquareMower(LawnState.mower, mower.getId());
+                        currentPos = nextPos;
                     }
                 }
                 return "ok";
             case southwest:
+                //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
-                    //todo: check step != mower,crater,fence,
-                    LawnState nextState = checkLocation(pos.x - i, pos.y - i);
+                    Point nextPos = new Point(currentPos.x - i, currentPos.y - i);
+                    LawnState nextState = checkLocation(nextPos);
                     if (nextState == LawnState.mower ||
                             nextState == LawnState.crater ||
                             nextState == LawnState.fence) {
                         return "crash";
                     } else {
-                        lawn[pos.x][pos.y] = new LawnSquare(LawnState.empty);
-                        lawn[pos.x - i][pos.y - i] = new LawnSquareMower(LawnState.mower, mower.getId());
-                        pos = new Point(pos.x - i, pos.y - i);
+                        lawn[currentPos.x][currentPos.y] = new LawnSquare(LawnState.empty);
+                        lawn[nextPos.x][nextPos.y] = new LawnSquareMower(LawnState.mower, mower.getId());
+                        currentPos = nextPos;
                     }
                 }
                 return "ok";
             case west:
-                newPoint = new Point(currentLocation.x-1, currentLocation.y);
-                lawnState = checkLocation( newPoint );
-                if( lawnState == LawnState.grass ){
-                    knownlawn.put(newPoint, LawnState.empty);
-                    return new Action(ActionState.move, 1, this.direction);
+                //todo: check step != mower,crater,fence
+                for (int i = 1; i <= action.getSteps(); i++) {
+                    Point nextPos = new Point(currentPos.x - i, currentPos.y);
+                    LawnState nextState = checkLocation(nextPos);
+                    if (nextState == LawnState.mower ||
+                            nextState == LawnState.crater ||
+                            nextState == LawnState.fence) {
+                        return "crash";
+                    } else {
+                        lawn[currentPos.x][currentPos.y] = new LawnSquare(LawnState.empty);
+                        lawn[nextPos.x][nextPos.y] = new LawnSquareMower(LawnState.mower, mower.getId());
+                        currentPos = nextPos;
+                    }
                 }
-                else{
-                    return null;
-                }
+                return "ok";
             case northwest:
-                newPoint = new Point(currentLocation.x-1, currentLocation.y+1);
-                lawnState = checkLocation( newPoint );
-                if( lawnState == LawnState.grass ){
-                    knownlawn.put(newPoint, LawnState.empty);
-                    return new Action(ActionState.move, 1, this.direction);
+                //todo: check step != mower,crater,fence
+                for (int i = 1; i <= action.getSteps(); i++) {
+                    Point nextPos = new Point(currentPos.x - i, currentPos.y + i);
+                    LawnState nextState = checkLocation(nextPos);
+                    if (nextState == LawnState.mower ||
+                            nextState == LawnState.crater ||
+                            nextState == LawnState.fence) {
+                        return "crash";
+                    } else {
+                        lawn[currentPos.x][currentPos.y] = new LawnSquare(LawnState.empty);
+                        lawn[nextPos.x][nextPos.y] = new LawnSquareMower(LawnState.mower, mower.getId());
+                        currentPos = nextPos;
+                    }
                 }
-                else{
-                    return null;
-                }
+                return "ok";
             default:
-                return null;
+                return "Lawn - moveMower() - switch default";
         }
-
-
     }
 
     /**
@@ -269,6 +281,7 @@ public class Lawn {
                 }
             }
         }
+        return null;
     }
 
 }

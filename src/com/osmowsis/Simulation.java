@@ -106,39 +106,32 @@ public class Simulation {
 
     public void takeTurn(){
 
-
-
-            // apply action to lawn model
-            //     AND validate action (ok/crash)
-            //     if crash set mower status to crash
-        //todo: display action/resonse
-        //todo: increase turn count
-        //sim.pollMowerForAction();
-        //sim.validateMowerAction();
-        //sim.displayActionAndResponses();
-
-        //todo: for each mower
+        //for each mower
         for(LawnMower mower : mowers) {
 
-            //todo: get action from mower
+            //continue to next mower if current mower is not running.
+            if( mower.getState() != MowerState.running ){
+                continue;
+            }
+
+            //get action from mower
             Action action = mower.getAction();
             String simulationResponse = "";
 
-            //todo: validate action
+            //validate action
             if( action.getState() == ActionState.scan ){
                 simulationResponse = sendScanToMower( mower );
             }
             else{
-                //todo: set action in lawn model
-                simulationResponse = lawn.mowerMove( mower, action);
-                simulationResponse = "response ok/crash unknown";
+                //set action in lawn model
+                simulationResponse = lawn.moveMower( mower, action);
             }
             System.out.println( action.toString() );
             System.out.println( simulationResponse );
         }
 
-        print();
         numOfTurns++;
+        print();
     }
 
     private String sendScanToMower(LawnMower mower){
@@ -146,125 +139,5 @@ public class Simulation {
         mower.setScan( scanResults );
         return scanResults;
     }
-
-/*
-    public void pollMowerForAction() {
-        int moveRandomChoice;
-
-        moveRandomChoice = randGenerator.nextInt(100);
-        if (moveRandomChoice < 2) {
-            // select turning off the mower as the action
-            trackAction = "turn_off";
-        } else if (moveRandomChoice < 10) {
-            // select scanning as the action
-            trackAction = "scan";
-        } else {
-            // select moving forward and the turning as the action
-            trackAction = "move";
-
-            // determine a distance
-            moveRandomChoice = randGenerator.nextInt(100);
-            if (moveRandomChoice < 20) {
-                trackMoveDistance = 0;
-            } else if (moveRandomChoice < 70) {
-                trackMoveDistance = 1;
-            } else {
-                trackMoveDistance = 2;
-            }
-
-            // determine a new direction
-            moveRandomChoice = randGenerator.nextInt(100);
-            if (moveRandomChoice < 50) {
-                switch (mowerDirection) {
-                    case "South":
-                        trackNewDirection = "Southwest";
-                        break;
-                    case "Southwest":
-                        trackNewDirection = "West";
-                        break;
-                    case "West":
-                        trackNewDirection = "Northwest";
-                        break;
-                    case "Northwest":
-                        trackNewDirection = "North";
-                        break;
-                    case "Southeast":
-                        trackNewDirection = "South";
-                        break;
-                    case "North":
-                        trackNewDirection = "Northeast";
-                        break;
-                    case "Northeast":
-                        trackNewDirection = "East";
-                        break;
-                    case "East":
-                        trackNewDirection = "Southeast";
-                        break;
-                    default:
-                        trackNewDirection = mowerDirection;
-                        break;
-                }
-            } else {
-                trackNewDirection = mowerDirection;
-            }
-        }
-    }
-
-    public void validateMowerAction() {
-        int xOrientation, yOrientation;
-
-        if (trackAction.equals("scan")) {
-            // in the case of a scan, return the information for the eight surrounding squares
-            // always use a northbound orientation
-            trackScanResults = "empty,grass,crater,fence,empty,grass,crater,fence";
-
-        } else if (trackAction.equals("move")) {
-            // in the case of a move, ensure that the move doesn't cross craters or fences
-            xOrientation = xDIR_MAP.get(mowerDirection);
-            yOrientation = yDIR_MAP.get(mowerDirection);
-
-            // just for this demonstration, allow the mower to change direction
-            // even if the move forward causes a crash
-            mowerDirection = trackNewDirection;
-
-            int newSquareX = mowerX + trackMoveDistance * xOrientation;
-            int newSquareY = mowerY + trackMoveDistance * yOrientation;
-
-            if (newSquareX >= 0 & newSquareX < lawnWidth & newSquareY >= 0 & newSquareY < lawnHeight) {
-                mowerX = newSquareX;
-                mowerY = newSquareY;
-                trackMoveCheck = "ok";
-
-                // update lawn status
-                lawnInfo[mowerX][mowerY] = EMPTY_CODE;
-            } else {
-                trackMoveCheck = "crash";
-            }
-
-        } else if (trackAction.equals("turn_off")) {
-            trackMoveCheck = "ok";
-        }
-    }
-
-    public void displayActionAndResponses() {
-        // display the mower's actions
-        System.out.print(trackAction);
-        if (trackAction.equals("move")) {
-            System.out.println("," + trackMoveDistance + "," + trackNewDirection);
-        } else {
-            System.out.println();
-        }
-
-        // display the simulation checks and/or responses
-        if (trackAction.equals("move") | trackAction.equals("turn_off")) {
-            System.out.println(trackMoveCheck);
-        } else if (trackAction.equals("scan")) {
-            System.out.println(trackScanResults);
-        } else {
-            System.out.println("action not recognized");
-        }
-    }
-
-*/
 
 }

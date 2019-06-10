@@ -13,7 +13,10 @@ public class Main {
 
             //loan simulation file
             sim.loadStartingFile(args[0]);
+
+            System.out.println("*************************************************");
             sim.print();
+            System.out.println("*************************************************");
 
             //run turns on simulation
             while( sim.hasTurn() ) {
