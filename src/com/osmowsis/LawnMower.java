@@ -57,6 +57,8 @@ public class LawnMower {
             switch( mowerAction.getState() ){
                 case crash:
                     return getNewDirection();
+                case empty:
+                    return getNewDirection();
                 case unknown:
                     return new Action(ActionState.scan);
                 default:
@@ -74,7 +76,6 @@ public class LawnMower {
                     new Point(currentLocation, d),
                     LawnState.valueOf( values[ d.getValue() ] )
             );
-            //System.out.println("Direction: " + d + ", value: " + d.getValue() );
         }
     }
 
@@ -124,6 +125,8 @@ public class LawnMower {
             case fence:
             case mower:
                 return new Action(ActionState.crash);
+            case empty:
+                return new Action(ActionState.empty);
             default:
                 return new Action(ActionState.unknown);
         }
@@ -136,7 +139,6 @@ public class LawnMower {
      * @return Action(move, 0, new_direction)
      */
     private Action getNewDirection() {
-        //System.out.println("getNewDirection - Direction Length: " + Direction.values().length);
         LawnState lawnState;
         for( Direction d : Direction.values() ){
             lawnState = checkLocation( new Point( currentLocation, d) );

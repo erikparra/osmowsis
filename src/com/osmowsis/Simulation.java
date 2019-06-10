@@ -129,7 +129,7 @@ public class Simulation {
             System.out.println( action.toString() );
             System.out.println( simulationResponse );
 
-            mower.printLawn();
+            //mower.printLawn();
         }
 
         numOfTurns++;

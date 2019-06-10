@@ -4,5 +4,6 @@ enum ActionState {
     move,
     scan,
     crash,
-    unknown
+    unknown,
+    empty
 }
