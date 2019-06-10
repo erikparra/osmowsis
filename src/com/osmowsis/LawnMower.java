@@ -179,9 +179,93 @@ public class LawnMower {
     }
 
 
+    /**
+     * Will scan the known areas around the mower and return the new direction it should travel, moving clockwise
+     *
+     * @return Action(move, 0, new_direction)
+     */
     private Action getNewDirection() {
-        System.out.println("getNewDirection - Direction Length: " + Direction.values().length);
+        //System.out.println("getNewDirection - Direction Length: " + Direction.values().length);
+        Point newPoint;
+        LawnState lawnState;
+        for( Direction d : Direction.values() ){
+            switch ( d ) {
+                case north:
+                    newPoint = new Point(currentLocation.x, currentLocation.y + 1);
+                    lawnState = checkLocation(newPoint);
+                    if( lawnState == LawnState.grass ){
+                        this.direction = Direction.north;
+                        return new Action(ActionState.move, 0, Direction.north);
+                    }
+                    break;
+                case northeast:
+                    newPoint = new Point(currentLocation.x + 1, currentLocation.y + 1);
+                    lawnState = checkLocation(newPoint);
+                    if( lawnState == LawnState.grass ){
+                        this.direction = Direction.northeast;
+                        return new Action(ActionState.move, 0, Direction.northeast);
+                    }
+                    break;
+                case east:
+                    newPoint = new Point(currentLocation.x + 1, currentLocation.y);
+                    lawnState = checkLocation(newPoint);
+                    if( lawnState == LawnState.grass ){
+                        this.direction = Direction.east;
+                        return new Action(ActionState.move, 0, Direction.east);
+                    }
+                    break;
+                case southeast:
+                    newPoint = new Point(currentLocation.x + 1, currentLocation.y - 1);
+                    lawnState = checkLocation(newPoint);
+                    if( lawnState == LawnState.grass ){
+                        this.direction = Direction.southeast;
+                        return new Action(ActionState.move, 0, Direction.southeast);
+                    }
+                    break;
+                case south:
+                    newPoint = new Point(currentLocation.x, currentLocation.y - 1);
+                    lawnState = checkLocation(newPoint);
+                    if( lawnState == LawnState.grass ){
+                        this.direction = Direction.south;
+                        return new Action(ActionState.move, 0, Direction.south);
+                    }
+                    break;
+                case southwest:
+                    newPoint = new Point(currentLocation.x - 1, currentLocation.y - 1);
+                    lawnState = checkLocation(newPoint);
+                    if( lawnState == LawnState.grass ){
+                        this.direction = Direction.southwest;
+                        return new Action(ActionState.move, 0, Direction.southwest);
+                    }
+                    break;
+                case west:
+                    newPoint = new Point(currentLocation.x - 1, currentLocation.y);
+                    lawnState = checkLocation(newPoint);
+                    if( lawnState == LawnState.grass ){
+                        this.direction = Direction.west;
+                        return new Action(ActionState.move, 0, Direction.west);
+                    }
+                    break;
+                case northwest:
+                    newPoint = new Point(currentLocation.x - 1, currentLocation.y + 1);
+                    lawnState = checkLocation(newPoint);
+                    if( lawnState == LawnState.grass ){
+                        this.direction = Direction.northwest;
+                        return new Action(ActionState.move, 0, Direction.northwest);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
 
+
+
+        // all spaces around mower are empty,
+        // find direction of grass in known state
+        // or shut off because grass is complete
+
+        System.out.println("Spaces around mower are empty, find direction toward grass");
         return new Action(ActionState.scan);
     }
 }

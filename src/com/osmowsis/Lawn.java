@@ -111,7 +111,7 @@ public class Lawn {
         scanResults += checkLocation(p).toString() + ",";
 
         //northwest
-        p = new Point(loc.x-1, loc.y );
+        p = new Point(loc.x-1, loc.y+1 );
         scanResults += checkLocation(p).toString() + ",";
 
         return scanResults;
