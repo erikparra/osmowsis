@@ -82,37 +82,29 @@ public class Lawn {
         //todo: if scan outisde boundry, return fence state
 
 
-        Point p = new Point(loc.x, loc.y+1 );
         //north
-        scanResults += checkLocation(p).toString() + ",";
+        scanResults += checkLocation( new Point(loc, Direction.north)).toString() + ",";
 
         //northeast
-        p = new Point(loc.x+1, loc.y+1 );
-        scanResults += checkLocation(p).toString() + ",";
+        scanResults += checkLocation( new Point(loc, Direction.northeast)).toString() + ",";
 
         //east
-        p = new Point(loc.x+1, loc.y );
-        scanResults += checkLocation(p).toString() + ",";
+        scanResults += checkLocation( new Point(loc, Direction.east)).toString() + ",";
 
         //southeast
-        p = new Point(loc.x+1, loc.y-1 );
-        scanResults += checkLocation(p).toString() + ",";
+        scanResults += checkLocation( new Point(loc, Direction.southeast)).toString() + ",";
 
         //south
-        p = new Point(loc.x, loc.y-1 );
-        scanResults += checkLocation(p).toString() + ",";
+        scanResults += checkLocation( new Point(loc, Direction.south)).toString() + ",";
 
         //southwest
-        p = new Point(loc.x-1, loc.y-1 );
-        scanResults += checkLocation(p).toString() + ",";
+        scanResults += checkLocation( new Point(loc, Direction.southwest)).toString() + ",";
 
         //west
-        p = new Point(loc.x-1, loc.y );
-        scanResults += checkLocation(p).toString() + ",";
+        scanResults += checkLocation( new Point(loc, Direction.west)).toString() + ",";
 
         //northwest
-        p = new Point(loc.x-1, loc.y+1 );
-        scanResults += checkLocation(p).toString() + ",";
+        scanResults += checkLocation( new Point(loc, Direction.northwest)).toString();
 
         return scanResults;
 

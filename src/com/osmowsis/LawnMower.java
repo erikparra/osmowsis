@@ -2,7 +2,6 @@ package com.osmowsis;
 
 import com.osmowsis.*;
 
-import java.awt.*;
 import java.util.HashMap;
 
 public class LawnMower {
@@ -72,30 +71,13 @@ public class LawnMower {
     public void setScan(String scanResults) {
         String[] values = scanResults.split(",");
 
-        //north
-        knownlawn.put(new Point(currentLocation.x, currentLocation.y + 1), LawnState.valueOf(values[0]));
-
-        //northeast
-        knownlawn.put(new Point(currentLocation.x + 1, currentLocation.y + 1), LawnState.valueOf(values[1]));
-
-        //east
-        knownlawn.put(new Point(currentLocation.x + 1, currentLocation.y), LawnState.valueOf(values[2]));
-
-        //southeast
-        knownlawn.put(new Point(currentLocation.x + 1, currentLocation.y - 1), LawnState.valueOf(values[3]));
-
-        //south
-        knownlawn.put(new Point(currentLocation.x, currentLocation.y - 1), LawnState.valueOf(values[0]));
-
-        //southwest
-        knownlawn.put(new Point(currentLocation.x - 1, currentLocation.y - 1), LawnState.valueOf(values[0]));
-
-        //west
-        knownlawn.put(new Point(currentLocation.x - 1, currentLocation.y), LawnState.valueOf(values[0]));
-
-        //northwest
-        knownlawn.put(new Point(currentLocation.x - 1, currentLocation.y + 1), LawnState.valueOf(values[0]));
-
+        for( Direction d : Direction.values() ){
+            knownlawn.put(
+                    new Point(currentLocation, d),
+                    LawnState.valueOf( values[ d.getValue() ] )
+            );
+            //System.out.println("Direction: " + d + ", value: " + d.getValue() );
+        }
     }
 
     /**
@@ -138,44 +120,9 @@ public class LawnMower {
      * ELSE return null
      */
     private Action moveCurrentDirection() {
-        Point newPoint;
-        LawnState lawnState;
-        switch (direction) {
-            case north:
-                newPoint = new Point(currentLocation.x, currentLocation.y + 1);
-                lawnState = checkLocation(newPoint);
-                return moveCurrentDirectionAction(newPoint, lawnState);
-            case northeast:
-                newPoint = new Point(currentLocation.x + 1, currentLocation.y + 1);
-                lawnState = checkLocation(newPoint);
-                return moveCurrentDirectionAction(newPoint, lawnState);
-            case east:
-                newPoint = new Point(currentLocation.x + 1, currentLocation.y);
-                lawnState = checkLocation(newPoint);
-                return moveCurrentDirectionAction(newPoint, lawnState);
-            case southeast:
-                newPoint = new Point(currentLocation.x + 1, currentLocation.y - 1);
-                lawnState = checkLocation(newPoint);
-                return moveCurrentDirectionAction(newPoint, lawnState);
-            case south:
-                newPoint = new Point(currentLocation.x, currentLocation.y - 1);
-                lawnState = checkLocation(newPoint);
-                return moveCurrentDirectionAction(newPoint, lawnState);
-            case southwest:
-                newPoint = new Point(currentLocation.x - 1, currentLocation.y - 1);
-                lawnState = checkLocation(newPoint);
-                return moveCurrentDirectionAction(newPoint, lawnState);
-            case west:
-                newPoint = new Point(currentLocation.x - 1, currentLocation.y);
-                lawnState = checkLocation(newPoint);
-                return moveCurrentDirectionAction(newPoint, lawnState);
-            case northwest:
-                newPoint = new Point(currentLocation.x - 1, currentLocation.y + 1);
-                lawnState = checkLocation(newPoint);
-                return moveCurrentDirectionAction(newPoint, lawnState);
-            default:
-                return null;
-        }
+        Point newPoint = new Point( currentLocation, direction);
+        LawnState lawnState = checkLocation( newPoint );
+        return moveCurrentDirectionAction( newPoint, lawnState );
     }
 
 
@@ -189,73 +136,10 @@ public class LawnMower {
         Point newPoint;
         LawnState lawnState;
         for( Direction d : Direction.values() ){
-            switch ( d ) {
-                case north:
-                    newPoint = new Point(currentLocation.x, currentLocation.y + 1);
-                    lawnState = checkLocation(newPoint);
-                    if( lawnState == LawnState.grass ){
-                        this.direction = Direction.north;
-                        return new Action(ActionState.move, 0, Direction.north);
-                    }
-                    break;
-                case northeast:
-                    newPoint = new Point(currentLocation.x + 1, currentLocation.y + 1);
-                    lawnState = checkLocation(newPoint);
-                    if( lawnState == LawnState.grass ){
-                        this.direction = Direction.northeast;
-                        return new Action(ActionState.move, 0, Direction.northeast);
-                    }
-                    break;
-                case east:
-                    newPoint = new Point(currentLocation.x + 1, currentLocation.y);
-                    lawnState = checkLocation(newPoint);
-                    if( lawnState == LawnState.grass ){
-                        this.direction = Direction.east;
-                        return new Action(ActionState.move, 0, Direction.east);
-                    }
-                    break;
-                case southeast:
-                    newPoint = new Point(currentLocation.x + 1, currentLocation.y - 1);
-                    lawnState = checkLocation(newPoint);
-                    if( lawnState == LawnState.grass ){
-                        this.direction = Direction.southeast;
-                        return new Action(ActionState.move, 0, Direction.southeast);
-                    }
-                    break;
-                case south:
-                    newPoint = new Point(currentLocation.x, currentLocation.y - 1);
-                    lawnState = checkLocation(newPoint);
-                    if( lawnState == LawnState.grass ){
-                        this.direction = Direction.south;
-                        return new Action(ActionState.move, 0, Direction.south);
-                    }
-                    break;
-                case southwest:
-                    newPoint = new Point(currentLocation.x - 1, currentLocation.y - 1);
-                    lawnState = checkLocation(newPoint);
-                    if( lawnState == LawnState.grass ){
-                        this.direction = Direction.southwest;
-                        return new Action(ActionState.move, 0, Direction.southwest);
-                    }
-                    break;
-                case west:
-                    newPoint = new Point(currentLocation.x - 1, currentLocation.y);
-                    lawnState = checkLocation(newPoint);
-                    if( lawnState == LawnState.grass ){
-                        this.direction = Direction.west;
-                        return new Action(ActionState.move, 0, Direction.west);
-                    }
-                    break;
-                case northwest:
-                    newPoint = new Point(currentLocation.x - 1, currentLocation.y + 1);
-                    lawnState = checkLocation(newPoint);
-                    if( lawnState == LawnState.grass ){
-                        this.direction = Direction.northwest;
-                        return new Action(ActionState.move, 0, Direction.northwest);
-                    }
-                    break;
-                default:
-                    break;
+            lawnState = checkLocation( new Point( currentLocation, d) );
+            if( lawnState == LawnState.grass ){
+                this.direction = d;
+                return new Action(ActionState.move, 0, d);
             }
         }
 
