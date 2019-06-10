@@ -78,6 +78,12 @@ public class LawnMower {
         }
     }
 
+    public void printLawn(){
+        for( Point key : knownlawn.keySet() ){
+            System.out.println( "[ "+key.x+" , "+key.y+" ] : " + knownlawn.get(key).toString());
+        }
+    }
+
     /**
      * Verify there is a square of fence
      */
