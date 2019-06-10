@@ -5,14 +5,12 @@ public class Action {
     private int steps;
     private Direction direction;
 
-    private LawnState lawnState;
 
-    //scan
+    // scan or unknown
     public Action(ActionState state){
         this.state = state;
         this.steps = 0;
         this.direction = null;
-        this.lawnState = null;
     }
 
     //move
@@ -20,16 +18,8 @@ public class Action {
         this.state = state;
         this.steps = steps;
         this.direction = direction;
-        this.lawnState = null;
     }
 
-    //crash
-    public Action(ActionState state, LawnState ls){
-        this.state = state;
-        this.steps = 0;
-        this.direction = null;
-        this.lawnState = ls;
-    }
 
     public ActionState getState(){
         return this.state;
@@ -43,9 +33,6 @@ public class Action {
         return this.direction;
     }
 
-    public LawnState getLawnState(){
-        return this.lawnState;
-    }
 
     public String toString(){
         if( state == ActionState.scan ){
