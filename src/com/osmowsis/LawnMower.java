@@ -44,18 +44,19 @@ public class LawnMower {
         }
 
         if (isLawnComplete()) {
-            return null;
+            //System.out.println("COMPLETE");
+            this.state = MowerState.off;
+            return new Action(ActionState.scan);
         }
 
         //first move is always scan
         if (knownlawn.size() == 1) {
             return new Action(ActionState.scan);
-        }
-        else {
+        } else {
 
             // todo: scan current direction
             Action mowerAction = moveCurrentDirection();
-            switch( mowerAction.getState() ){
+            switch (mowerAction.getState()) {
                 case crash:
                     return getNewDirection();
                 case empty:
@@ -72,61 +73,76 @@ public class LawnMower {
     public void setScan(String scanResults) {
         String[] values = scanResults.split(",");
 
-        for( Direction d : Direction.values() ){
+        for (Direction d : Direction.values()) {
             knownlawn.put(
                     new Point(currentLocation, d),
-                    LawnState.valueOf( values[ d.getValue() ] )
+                    LawnState.valueOf(values[d.getValue()])
             );
         }
     }
 
-    public void printLawn(){
-        for( Point key : knownlawn.keySet() ){
-            System.out.println( "[ "+key.x+" , "+key.y+" ] : " + knownlawn.get(key).toString());
-        }
-    }
-
-    /**
-     * Verify there is a square of fence
-     */
-    private boolean isLawnComplete() {
-        // sort to get bottom left corner
-        LinkedHashMap<Point, LawnState> sortedLowest = knownlawn.entrySet().stream()
-                .sorted( (p1, p2) ->{
-                    if( p1.getKey().x == p2.getKey().x ){
+    public void printLawn() {
+        LinkedHashMap<Point, LawnState> sorted = knownlawn.entrySet().stream()
+                .sorted((p1, p2) -> {
+                    if (p1.getKey().x == p2.getKey().x) {
                         return p1.getKey().y - p2.getKey().y;
-                    }
-                    else{
+                    } else {
                         return p1.getKey().x - p2.getKey().x;
                     }
                 })
-                .collect( Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (oldValue, newValue) ->oldValue, LinkedHashMap::new));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+        for (Point key : sorted.keySet()) {
+            //System.out.println( key );
+            System.out.println("[\t" + key.x + "\t,\t" + key.y + "\t] : " + knownlawn.get(key).toString());
+        }
+    }
 
-        LinkedHashMap<Point, LawnState> sortedHighest = knownlawn.entrySet().stream()
-                .sorted( (p1, p2) ->{
-                    if( p1.getKey().x == p2.getKey().x ){
-                        return p2.getKey().y - p1.getKey().y;
-                    }
-                    else{
-                        return p2.getKey().x - p1.getKey().x;
-                    }
-                })
-                .collect( Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (oldValue, newValue) ->oldValue, LinkedHashMap::new));
 
-        Point bottomLeft = sortedLowest.entrySet().stream().findFirst().get().getKey();
-        Point topRight = sortedHighest.entrySet().stream().findFirst().get().getKey();
+    /**
+     * Verify there is a square of fence
+     *   check bottom left has north and east fence
+     *   check top right has south and west fence
+     */
+    private boolean isLawnComplete() {
+        // sort to get bottom left corner
+        Point bottomLeft = getBottomLeftPoint();
+        Point topRight = getTopRightPoint();
 
-        //System.out.println("Sorted Map: " + sortedLowest);
-        //System.out.println("First : "+ sortedLowest.entrySet().stream().findFirst().toString() );
+        if( bottomLeft.equals(topRight ) ){
+            return false;
+        }
 
-        //System.out.println("Sorted Map: " + sortedHighest);
-        //System.out.println("First : "+ sortedHighest.entrySet().stream().findFirst().toString() );
 
+        LawnState north = checkLocation( new Point( bottomLeft, Direction.north) );
+        LawnState east = checkLocation( new Point( bottomLeft, Direction.east) );
+
+        LawnState south = checkLocation( new Point( topRight, Direction.south) );
+        LawnState west = checkLocation( new Point( topRight, Direction.west) );
+
+        LawnState bottom = checkLocation( bottomLeft );
+        LawnState top = checkLocation( topRight );
+
+        if( north != LawnState.fence ||
+                east != LawnState.fence ||
+                south != LawnState.fence ||
+                west != LawnState.fence ||
+                bottom != LawnState.fence ||
+                top != LawnState.fence )
         return false;
 
 
+        for( int x = bottomLeft.x; x < topRight.x; x++ ){
+            for( int y = bottomLeft.y; y < topRight.y; y++ ){
+                Point testPoint = new Point(x, y);
+                LawnState testLawnState = checkLocation(testPoint);
+                if( testLawnState == null || testLawnState == LawnState.grass ){
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -148,12 +164,12 @@ public class LawnMower {
      * ELSE return null
      */
     private Action moveCurrentDirection() {
-        Point newPoint = new Point( currentLocation, direction);
-        LawnState lawnState = checkLocation( newPoint );
-        if( lawnState == null ){
+        Point newPoint = new Point(currentLocation, direction);
+        LawnState lawnState = checkLocation(newPoint);
+        if (lawnState == null) {
             return new Action(ActionState.unknown);
         }
-        switch ( lawnState ) {
+        switch (lawnState) {
             case grass:
                 knownlawn.put(newPoint, LawnState.empty);
                 currentLocation = newPoint;
@@ -177,62 +193,170 @@ public class LawnMower {
      */
     private Action getNewDirection() {
         LawnState lawnState;
-        for( Direction d : Direction.values() ){
-            lawnState = checkLocation( new Point( currentLocation, d) );
-            if( lawnState == LawnState.grass ){
+        for (Direction d : Direction.values()) {
+            lawnState = checkLocation(new Point(currentLocation, d));
+            if (lawnState == LawnState.grass) {
                 this.direction = d;
                 return new Action(ActionState.move, 0, d);
             }
         }
 
-        //if all spaces around mower are id and blocking
+        // if all spaces around mower are id and empty
         //  find direction of grass or missing spaces
         //  shutdown if all spaces are found.
-        if( surroundingSpacesScanned() ){
 
-            // sort to get bottom left corner
-            LinkedHashMap<Point, LawnState> sortedLowest = knownlawn.entrySet().stream()
-                    .sorted( (p1, p2) ->{
-                        if( p1.getKey().x == p2.getKey().x ){
-                            return p1.getKey().y - p2.getKey().y;
-                        }
-                        else{
-                            return p1.getKey().x - p2.getKey().x;
-                        }
-                    })
-                    .collect( Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                            (oldValue, newValue) ->oldValue, LinkedHashMap::new));
-
-            LinkedHashMap<Point, LawnState> sortedHighest = knownlawn.entrySet().stream()
-                    .sorted( (p1, p2) ->{
-                        if( p1.getKey().x == p2.getKey().x ){
-                            return p2.getKey().y - p1.getKey().y;
-                        }
-                        else{
-                            return p2.getKey().x - p1.getKey().x;
-                        }
-                    })
-                    .collect( Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                            (oldValue, newValue) ->oldValue, LinkedHashMap::new));
-
-            Point bottomLeft = sortedLowest.entrySet().stream().findFirst().get().getKey();
-            Point topRight = sortedHighest.entrySet().stream().findFirst().get().getKey();
-
-            System.out.println("Sorted Map: " + sortedLowest);
-            System.out.println("First : "+ sortedLowest.entrySet().stream().findFirst().toString() );
-
-            System.out.println("Sorted Map: " + sortedHighest);
-            System.out.println("First : "+ sortedHighest.entrySet().stream().findFirst().toString() );
-
-
-
-            //FIND new direction towared missing grass or spaces
+        if (surroundingSpacesScanned()) {
+            Point nextPoint = getFirstGrassPoint();
+            if (nextPoint == null) {
+                nextPoint = getMissingAreaPoint();
+                if( nextPoint == null ){
+                    this.state = MowerState.off;
+                    return new Action(ActionState.scan);
+                }
+                else{
+                    return directionTowardPoint( nextPoint );
+                }
+            }
+            else{
+                return directionTowardPoint( nextPoint );
+            }
+        } else {
             return new Action(ActionState.scan);
+        }
+
+    }
+
+    private Direction degreeToDirection( double degrees ){
+        //north
+        if( degrees <= (90+(11.25*2)) && degrees > (90-(11.25*2)) ){
+            return Direction.north;
+        }
+        //northeast
+        else if( degrees <= (45+(11.25*2)) && degrees > (45-(11.25*2)) ){
+            return Direction.northeast;
+        }
+        //east
+        else if( degrees <= (0+(11.25*2)) && degrees > (0-(11.25*2)) ){
+            return Direction.east;
+        }
+        //southeast
+        else if( degrees <= (-45+(11.25*2)) && degrees > (-45-(11.25*2)) ){
+            return Direction.southeast;
+        }
+        //south
+        else if( degrees <= (-90+(11.25*2)) && degrees > (-90-(11.25*2)) ){
+            return Direction.south;
+        }
+        //southwest
+        else if( degrees <= (-135+(11.25*2)) && degrees > (-135-(11.25*2)) ){
+            return Direction.southwest;
+        }
+        //west
+        else if( degrees <= (180+(11.25*2)) && degrees > (180-(11.25*2)) ){
+            return Direction.west;
+        }
+        //northwest
+        else if( degrees <= (135+(11.25*2)) && degrees > (45-(11.25*2)) ){
+            return Direction.northwest;
         }
         else{
-            return new Action(ActionState.scan);
+            System.out.println("ERROR: SHOULD NOT BE HERE LawnMower.degreeToDirection LAST ELSE");
+            return Direction.north;
+        }
+    }
+
+    private Action directionTowardPoint( Point destPoint ){
+
+        //System.out.println( currentLocation );
+        //System.out.println( destPoint );
+
+        double radians = Math.atan2( destPoint.y - currentLocation.y, destPoint.x - currentLocation.x);
+        double degrees = Math.toDegrees( radians );
+
+        Direction nextDirection = degreeToDirection( degrees );
+        Point nextPoint = new Point( currentLocation, nextDirection);
+        LawnState nextLawnState = checkLocation( nextPoint );
+        while( nextLawnState != LawnState.grass && nextLawnState != LawnState.empty ){
+            degrees = degrees = (11.25*2);
+            nextDirection = degreeToDirection( degrees );
+            nextLawnState = checkLocation( new Point( currentLocation, nextDirection));
         }
 
+        if( this.direction == nextDirection ){
+            knownlawn.put(nextPoint, LawnState.empty);
+            currentLocation = nextPoint;
+            return new Action(ActionState.move, 1, this.direction);
+        }
+        else{
+            this.direction = nextDirection;
+            return new Action(ActionState.move, 0, nextDirection);
+        }
+    }
+
+    /**
+     * Scan map for missing area or grass
+     *
+     */
+    private Point getMissingAreaPoint() {
+        Point bottomLeft = getBottomLeftPoint();
+        Point topRight = getTopRightPoint();
+
+        for( int x = bottomLeft.x; x < topRight.x; x++ ){
+            for( int y = bottomLeft.y; y < topRight.y; y++ ){
+                Point testPoint = new Point(x, y);
+                LawnState testLawnState = checkLocation(testPoint);
+                if( testLawnState == null || testLawnState == LawnState.grass ){
+                    return testPoint;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Point getBottomLeftPoint() {
+        LinkedHashMap<Point, LawnState> sorted = knownlawn.entrySet().stream()
+                .sorted((p1, p2) -> {
+                    if (p1.getKey().x == p2.getKey().x) {
+                        return p1.getKey().y - p2.getKey().y;
+                    } else {
+                        return p1.getKey().x - p2.getKey().x;
+                    }
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+        return sorted.entrySet().stream().findFirst().get().getKey();
+    }
+
+    private Point getTopRightPoint() {
+        LinkedHashMap<Point, LawnState> sorted = knownlawn.entrySet().stream()
+                .sorted((p1, p2) -> {
+                    if (p1.getKey().x == p2.getKey().x) {
+                        return p2.getKey().y - p1.getKey().y;
+                    } else {
+                        return p2.getKey().x - p1.getKey().x;
+                    }
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+        return sorted.entrySet().stream().findFirst().get().getKey();
+    }
+
+    /**
+     * @return Point First instance of grass in known map, or null if not found
+     */
+    private Point getFirstGrassPoint() {
+        HashMap<Point, LawnState> grassPoints = knownlawn.entrySet()
+                .stream()
+                .filter(map -> map.getValue() == LawnState.grass)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (prev, next) -> next, LinkedHashMap::new));
+        if (grassPoints.isEmpty()) {
+            return null;
+        } else {
+            return grassPoints.entrySet().stream().findFirst().get().getKey();
+        }
     }
 
     /**
@@ -240,10 +364,10 @@ public class LawnMower {
      *
      * @return boolean true if all are identified
      */
-    private boolean surroundingSpacesScanned(){
-        for( Direction d : Direction.values() ){
-            LawnState lawnState = checkLocation( new Point( currentLocation, d) );
-            if(lawnState == null ){
+    private boolean surroundingSpacesScanned() {
+        for (Direction d : Direction.values()) {
+            LawnState lawnState = checkLocation(new Point(currentLocation, d));
+            if (lawnState == null) {
                 return false;
             }
         }

@@ -91,7 +91,7 @@ public class Simulation {
             maxTurns = Integer.parseInt(tokens[0]);
 
             //set lawn number of grass
-            lawn.setNumOfGrass();
+            lawn.setNumOfGrass( numMowers );
 
             scanner.close();
         } catch (Exception e) {
@@ -100,9 +100,6 @@ public class Simulation {
         }
     }
 
-    public void print(){
-        lawn.renderLawn();
-    }
 
     public void takeTurn(){
 
@@ -133,7 +130,14 @@ public class Simulation {
         }
 
         numOfTurns++;
-        print();
+        lawn.renderLawn();
+    }
+
+    public void printResults(){
+        System.out.println( lawn.getNumberOfSquares() + "," +
+                lawn.getNumberOfGrass() + "," +
+                lawn.getNumberOfGrassCut() + "," +
+                this.numOfTurns );
     }
 
     private String sendScanToMower(LawnMower mower){

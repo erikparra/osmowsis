@@ -21,6 +21,25 @@ public class Lawn {
         }
     }
 
+    public int getNumberOfSquares(){
+        return this.width * this.height;
+    }
+
+    public int getNumberOfGrass(){
+        return numberOfGrass;
+    }
+
+    public int getNumberOfGrassCut(){
+        int count = 0;
+        for( int i = 0; i < lawn.length; i++ ){
+            for( int j = 0; j < lawn[0].length; j++ ){
+                if( lawn[i][j].getState() == LawnState.grass )
+                    count++;
+            }
+        }
+        return this.numberOfGrass - count;
+    }
+
     public void addMower( int x, int y, int id ){
         lawn[x][y] = new LawnSquareMower( LawnState.mower, id);
     }
@@ -29,7 +48,7 @@ public class Lawn {
         lawn[x][y] = new LawnSquare( LawnState.crater );
     }
 
-    public void setNumOfGrass(){
+    public void setNumOfGrass( int mowerCount ){
         int count = 0;
         for( int i = 0; i < lawn.length; i++ ){
             for( int j = 0; j < lawn[0].length; j++ ){
@@ -37,7 +56,7 @@ public class Lawn {
                     count++;
             }
         }
-        this.numberOfGrass = count;
+        this.numberOfGrass = count+mowerCount;
     }
 
 
