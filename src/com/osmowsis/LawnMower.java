@@ -265,24 +265,112 @@ public class LawnMower {
         }
     }
 
+    private Direction[] getAdjacentDirection( Direction d ){
+        Direction[] dirs = new Direction[2];
+        switch (d) {
+            case north:
+                dirs[0] = Direction.northwest;
+                dirs[1] = Direction.northeast;
+                return dirs;
+            case northeast:
+                dirs[0] = Direction.north;
+                dirs[1] = Direction.east;
+                return dirs;
+            case east:
+                dirs[0] = Direction.northeast;
+                dirs[1] = Direction.southeast;
+                return dirs;
+            case southeast:
+                dirs[0] = Direction.east;
+                dirs[1] = Direction.south;
+                return dirs;
+            case south:
+                dirs[0] = Direction.southeast;
+                dirs[1] = Direction.southwest;
+                return dirs;
+            case southwest:
+                dirs[0] = Direction.south;
+                dirs[1] = Direction.west;
+                return dirs;
+            case west:
+                dirs[0] = Direction.southwest;
+                dirs[1] = Direction.northwest;
+                return dirs;
+            case northwest:
+                dirs[0] = Direction.west;
+                dirs[1] = Direction.north;
+                return dirs;
+            default:
+                return null;
+        }
+    }
+
+
+    private Direction checkNextAdjacentPoint( Direction nextD, Direction leftD, Direction rightD, int which){
+        Point nextPoint;
+        LawnState nextLawnState;
+        if( which == 0 ){
+            //check direct path
+            nextPoint = new Point( currentLocation, nextD );
+            nextLawnState = checkLocation( nextPoint );
+            if( nextLawnState == LawnState.grass || nextLawnState == LawnState.empty ){
+                return nextD;
+            }
+            else{
+                return checkNextAdjacentPoint(null, leftD, rightD, 1);
+            }
+        }
+        else if( which == 1 ){
+            //left
+            nextPoint = new Point( currentLocation, leftD );
+            nextLawnState = checkLocation( nextPoint );
+            if( nextLawnState == LawnState.grass || nextLawnState == LawnState.empty ){
+                return leftD;
+            }
+            else{
+                Direction[] ds = getAdjacentDirection(leftD);
+                return checkNextAdjacentPoint(null, ds[0], rightD, 2);
+            }
+        }
+        else{
+            //right
+            nextPoint = new Point( currentLocation, rightD );
+            nextLawnState = checkLocation( nextPoint );
+            if( nextLawnState == LawnState.grass || nextLawnState == LawnState.empty ){
+                return rightD;
+            }
+            else{
+                Direction[] ds = getAdjacentDirection(rightD);
+                return checkNextAdjacentPoint(null, leftD, ds[1], 1);
+            }
+        }
+    }
+
     private Action directionTowardPoint( Point destPoint ){
 
-        //System.out.println( currentLocation );
-        //System.out.println( destPoint );
+        //System.out.println(currentLocation);
+        //System.out.println(destPoint);
 
         double radians = Math.atan2( destPoint.y - currentLocation.y, destPoint.x - currentLocation.x);
         double degrees = Math.toDegrees( radians );
 
         Direction nextDirection = degreeToDirection( degrees );
-        Point nextPoint = new Point( currentLocation, nextDirection);
-        LawnState nextLawnState = checkLocation( nextPoint );
+        //Point nextPoint = new Point( currentLocation, nextDirection);
+        //LawnState nextLawnState = checkLocation( nextPoint );
+        Direction[] dirs = getAdjacentDirection(nextDirection);
+
+        nextDirection = checkNextAdjacentPoint( nextDirection, dirs[0], dirs[1], 0);
+
+/*
         while( nextLawnState != LawnState.grass && nextLawnState != LawnState.empty ){
-            degrees = degrees = (11.25*2);
+            degrees = degrees + (11.25*2);
             nextDirection = degreeToDirection( degrees );
             nextLawnState = checkLocation( new Point( currentLocation, nextDirection));
         }
+        */
 
         if( this.direction == nextDirection ){
+            Point nextPoint = new Point(currentLocation, nextDirection);
             knownlawn.put(nextPoint, LawnState.empty);
             currentLocation = nextPoint;
             return new Action(ActionState.move, 1, this.direction);
