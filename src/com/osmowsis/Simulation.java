@@ -130,7 +130,7 @@ public class Simulation {
         }
 
         numOfTurns++;
-        lawn.renderLawn();
+        //lawn.renderLawn();
     }
 
     public void printResults(){
