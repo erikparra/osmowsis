@@ -1,0 +1,114 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+'hide circle
+
+title __OSMOWSIS Class Diagram__\n
+
+center header
+Name: Erik Parra
+Assignment: #4
+UML version 2
+end header
+
+class Action {
+    - state: ActionState
+    - steps: int
+    - direction:Direction
+
+    + Action(ActionState)
+    + Action(ActionState, int, Direction)
+    + getState(): ActionState
+    + getSteps(): int
+    + getDirection(): Direction
+    + toString(): String
+}
+
+enum ActionState <<enumeration>> {
+    move
+    scan
+    crash
+    unknown
+    empty
+}
+
+enum Direction <<enumeration>> {
+    north: 0
+    northeast: 1
+    east: 2
+    southeast: 3
+    south: 4
+    southwest: 5
+    west: 6
+    northwest: 7
+    - value: int
+
+    - Direction(int)
+    + getValue(): int
+}
+
+class Lawn {
+    - lawn: LawnSquare[][]
+    - width: int
+    - height: int
+    - numberOfGrass: int
+    + Lawn( width: int, height: int  )
+    + getNumberOfSquares(): int
+    + getNumberOfGrass(): int
+    + getNumberOfGrassCut(): int
+    + addMower( x: int, y: int, id: int )
+    + addCrater( x: int, y: int )
+    + setNumOfGrass( mowerCount: int )
+    + renderLawn()
+    + getScan( mower: LawnMower ): String
+    +  moveMower(mower: LawnMower, action: Action): String
+    - checkLocation( p: Point ): LawnState
+    - renderHorizontalBar(size: int)
+    - findMower( mower: LawnMower ): Point
+}
+
+
+    class LawnMower {
+    }
+
+
+    class LawnSquare {
+    }
+
+
+    class LawnSquareMower {
+    }
+
+
+     enum LawnState <<enumeration>> {
+    }
+
+
+    class Main {
+    }
+
+
+    enum MowerState <<enumeration>> {
+    }
+
+
+    class Point {
+    }
+
+
+    class Simulation {
+    }
+
+
+  Action o-- ActionState : state
+  Action o-- Direction : direction
+  LawnMower o-- Direction : direction
+  LawnMower o-- MowerState : state
+  LawnMower o-- Point : currentLocation
+  LawnSquare o-- LawnState : state
+  LawnSquareMower -up-|> LawnSquare
+  Point -up-|> Point
+  Simulation o-- Lawn : lawn
+
+
+@enduml
