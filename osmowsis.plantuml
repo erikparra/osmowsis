@@ -11,20 +11,20 @@ Assignment: #4
 UML version 2
 end header
 
-class Action {
+class com.osmowsis.Action {
     - state: ActionState
     - steps: int
-    - direction:Direction
+    - direction: Direction
 
-    + Action(ActionState)
-    + Action(ActionState, int, Direction)
+    + Action( state: ActionState)
+    + Action( state: ActionState, steps: int, direction: Direction)
     + getState(): ActionState
     + getSteps(): int
     + getDirection(): Direction
     + toString(): String
 }
 
-enum ActionState <<enumeration>> {
+enum com.osmowsis.ActionState <<enumeration>> {
     move
     scan
     crash
@@ -32,7 +32,7 @@ enum ActionState <<enumeration>> {
     empty
 }
 
-enum Direction <<enumeration>> {
+enum com.osmowsis.Direction <<enumeration>> {
     north: 0
     northeast: 1
     east: 2
@@ -43,11 +43,11 @@ enum Direction <<enumeration>> {
     northwest: 7
     - value: int
 
-    - Direction(int)
+    - Direction( int )
     + getValue(): int
 }
 
-class Lawn {
+class com.osmowsis.Lawn {
     - lawn: LawnSquare[][]
     - width: int
     - height: int
@@ -61,54 +61,115 @@ class Lawn {
     + setNumOfGrass( mowerCount: int )
     + renderLawn()
     + getScan( mower: LawnMower ): String
-    +  moveMower(mower: LawnMower, action: Action): String
+    +  moveMower( mower: LawnMower, action: Action): String
     - checkLocation( p: Point ): LawnState
-    - renderHorizontalBar(size: int)
+    - renderHorizontalBar( size: int)
     - findMower( mower: LawnMower ): Point
 }
 
 
-    class LawnMower {
-    }
+class com.osmowsis.LawnMower {
+
+    - id: int
+    - direction: Direction
+    - state: MowerState
+    - currentLocation: Point
+    - knownlawn: HashMap<Point, LawnState>
+
+    + LawnMower( id: int, dir: Direction)
+    + getDirection(): Direction
+    + getState(): MowerState
+    + getId(): int
+    + getAction(): Action
+    + setScan()
+    + printLawn()
+    - isLawnComplete(): boolean
+    - checkLocation(p: Point): LawnState
+    - moveCurrentDirection(): Action
+    - getNewDirection(): Action
+    - degreeToDirection( degrees: double): Direction
+    - getAdjacentDirection( d: Direction): Direction[]
+    - checkNextAdjacentPoint( nextD: Direction, leftD: Direction, rightD: Direction, which: int): Direction
+    - directionTowardPoint( destPoint: Point): Action
+    - getMissingAreaPoint(): Point
+    - getBottomLeftPoint(): Point
+    - getTopRightPoint(): Point
+    - getFirstGrassPoint(): Point
+    - surroundingSpacesScanned(): boolean
+}
 
 
-    class LawnSquare {
-    }
+class com.osmowsis.LawnSquare {
+    - state: LawnState
+    + LawnSquare( ls: LawnState )
+    + getState(): LawnState
+    + setState( ls: LawnState )
+}
 
 
-    class LawnSquareMower {
-    }
+class com.osmowsis.LawnSquareMower {
+    - id: int
+    + LawnSquareMower( ls: LawnState, id: int )
+    + getId(): int
+    + setId( id: int )
+}
+
+enum com.osmowsis.LawnState <<enumeration>> {
+    grass
+    crater
+    mower
+    empty
+    fence
+}
+
+class com.osmowsis.Main {
+}
+
+enum com.osmowsis.MowerState <<enumeration>> {
+    crashed,
+    running,
+    off
+}
+
+class java.awt.Point {
+    + x: int
+    + y: int
+}
 
 
-     enum LawnState <<enumeration>> {
-    }
+class com.osmowsis.Point {
+    + Point( x: int, y: int )
+    + Point( p: Point )
+    + Point( p: Point, direction: Direction )
+}
 
 
-    class Main {
-    }
+class com.osmowsis.Simulation {
+    - {static} DEFAULT_MAX_SIZE: int
+    - lawn: Lawn
+    - mowers: ArrayList<LawnMower>
+    - maxTurns: int
+    - numOfTurns: int
+
+    + Simulation()
+    + hasTurn(): boolean
+    + loadStartingFile( testFileName: String )
+    + takeTurn()
+    + printResults()
+    - sendScanToMower( mower: LawnMower ): String
+
+}
 
 
-    enum MowerState <<enumeration>> {
-    }
-
-
-    class Point {
-    }
-
-
-    class Simulation {
-    }
-
-
-  Action o-- ActionState : state
-  Action o-- Direction : direction
-  LawnMower o-- Direction : direction
-  LawnMower o-- MowerState : state
-  LawnMower o-- Point : currentLocation
-  LawnSquare o-- LawnState : state
-  LawnSquareMower -up-|> LawnSquare
-  Point -up-|> Point
-  Simulation o-- Lawn : lawn
+  com.osmowsis.Action o-- com.osmowsis.ActionState : state
+  com.osmowsis.Action o-- com.osmowsis.Direction : direction
+  com.osmowsis.LawnMower o-- com.osmowsis.Direction : direction
+  com.osmowsis.LawnMower o-- com.osmowsis.MowerState : state
+  com.osmowsis.LawnMower o-- com.osmowsis.Point : currentLocation
+  com.osmowsis.LawnSquare o-- com.osmowsis.LawnState : state
+  com.osmowsis.LawnSquareMower -up-|> com.osmowsis.LawnSquare
+  com.osmowsis.Point -up-|> java.awt.Point
+  com.osmowsis.Simulation o-- com.osmowsis.Lawn : lawn
 
 
 @enduml
