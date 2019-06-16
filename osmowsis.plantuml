@@ -75,8 +75,10 @@ class com.osmowsis.LawnMower {
     - state: MowerState
     - currentLocation: Point
     - knownlawn: HashMap<Point, LawnState>
+    - numberOfMowers: int
+    - energyLevel: int
 
-    + LawnMower( id: int, dir: Direction)
+    + LawnMower( id: int, dir: Direction, mowerCount: int)
     + getDirection(): Direction
     + getState(): MowerState
     + getId(): int
@@ -120,6 +122,7 @@ enum com.osmowsis.LawnState <<enumeration>> {
     mower
     empty
     fence
+    charger
 }
 
 class com.osmowsis.Main {
@@ -150,6 +153,7 @@ class com.osmowsis.Simulation {
     - mowers: ArrayList<LawnMower>
     - maxTurns: int
     - numOfTurns: int
+    - numofMowers: int
 
     + Simulation()
     + hasTurn(): boolean
@@ -161,15 +165,16 @@ class com.osmowsis.Simulation {
 }
 
 
-  com.osmowsis.Action o-- com.osmowsis.ActionState : state
-  com.osmowsis.Action o-- com.osmowsis.Direction : direction
-  com.osmowsis.LawnMower o-- com.osmowsis.Direction : direction
-  com.osmowsis.LawnMower o-- com.osmowsis.MowerState : state
-  com.osmowsis.LawnMower o-- com.osmowsis.Point : currentLocation
-  com.osmowsis.LawnSquare o-- com.osmowsis.LawnState : state
-  com.osmowsis.LawnSquareMower -up-|> com.osmowsis.LawnSquare
-  com.osmowsis.Point -up-|> java.awt.Point
-  com.osmowsis.Simulation o-- com.osmowsis.Lawn : lawn
+com.osmowsis.Simulation "1" *-- "1" com.osmowsis.Lawn  : contains
+com.osmowsis.Simulation "1" *-- "1..*" com.osmowsis.LawnMower  : contains
+com.osmowsis.Lawn "1" *-- "1..*" com.osmowsis.LawnSquare : contains
+com.osmowsis.LawnSquareMower -up-|> com.osmowsis.LawnSquare
+com.osmowsis.Point -up-|> java.awt.Point
+com.osmowsis.LawnMower --> com.osmowsis.Action : creates
+
+com.osmowsis.LawnMower "0..*" o-- "0..*" com.osmowsis.Point : knownlawn
+com.osmowsis.Main "1" *-- "1" com.osmowsis.Simulation : creates
+
 
 
 @enduml

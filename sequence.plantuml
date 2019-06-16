@@ -1,0 +1,47 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+'hide circle
+
+title __Sequence Diagram__\n
+
+center header
+Name: Erik Parra
+Assignment: #4
+UML version 2
+end header
+
+
+
+activate Simulation
+Simulation -> LawnMower: Get Action
+activate LawnMower
+LawnMower -> SharedLawn : Get Lawn details
+activate SharedLawn
+SharedLawn --> LawnMower : Lawn Details
+deactivate SharedLawn
+LawnMower --> Simulation: Action
+deactivate LawnMower
+
+alt Action == Scan
+    Simulation -> Lawn : Get Scan ( mowerLocation )
+    activate Lawn
+    Lawn --> Simulation : Scan Information
+    deactivate Lawn
+    Simulation -> LawnMower : Send Scan Information
+    activate LawnMower
+    LawnMower -> SharedLawn : Merge Scan Details
+    activate SharedLawn
+    deactivate SharedLawn
+    deactivate LawnMower
+else Action == Move
+    Simulation -> Lawn : Verify Action ( Action )
+    activate Lawn
+    Lawn --> Simulation : Action Response
+    deactivate Lawn
+    Simulation -> LawnMower : Update Location/Status
+    activate LawnMower
+    deactivate LawnMower
+end
+
+@enduml
