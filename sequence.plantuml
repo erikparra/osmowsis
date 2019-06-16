@@ -39,9 +39,35 @@ else Action == Move
     activate Lawn
     Lawn --> Simulation : Action Response
     deactivate Lawn
-    Simulation -> LawnMower : Update Location/Status
-    activate LawnMower
-    deactivate LawnMower
+
+    alt Action Response == ok
+        Simulation -> LawnMower : Update Mower( Location, Status )
+        activate LawnMower
+        LawnMower -> SharedLawn : Update SharedLawn( Mower )
+        activate SharedLawn
+        deactivate SharedLawn
+        deactivate LawnMower
+        Simulation -> Lawn : Update Location ( mower )
+        activate Lawn
+        deactivate Lawn
+    else Action Response == crash
+        Simulation -> LawnMower : Update Mower( Disable )
+        activate LawnMower
+        LawnMower -> SharedLawn : Update SharedLawn( Mower )
+        activate SharedLawn
+        deactivate SharedLawn
+        deactivate LawnMower
+    else Action Response == stall
+        Simulation -> LawnMower : Update Mower( Stall )
+        activate LawnMower
+        LawnMower -> SharedLawn : Update SharedLawn( Mower )
+        activate SharedLawn
+        deactivate SharedLawn
+        deactivate LawnMower
+        Simulation -> Lawn : Update Location ( mower )
+        activate Lawn
+        deactivate Lawn
+    end
 end
 
 @enduml

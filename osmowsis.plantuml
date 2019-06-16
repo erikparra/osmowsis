@@ -74,7 +74,7 @@ class com.osmowsis.LawnMower {
     - direction: Direction
     - state: MowerState
     - currentLocation: Point
-    - knownlawn: HashMap<Point, LawnState>
+    - knownlawn: SharedLawn
     - numberOfMowers: int
     - energyLevel: int
 
@@ -161,7 +161,14 @@ class com.osmowsis.Simulation {
     + takeTurn()
     + printResults()
     - sendScanToMower( mower: LawnMower ): String
+}
 
+class com.osmowsis.SharedLawn <<Singleton>>{
+    - lawn: HashMap<Point, LawnState>
+    - mowerLawns: ArrayList<HashMap<Point, LawnState>>
+    + addData( mower: LawnMower, data: String )
+    + getLawn( id: int ): HashMap<Point, LawnState>
+    - meregeData()
 }
 
 
@@ -172,8 +179,9 @@ com.osmowsis.LawnSquareMower -up-|> com.osmowsis.LawnSquare
 com.osmowsis.Point -up-|> java.awt.Point
 com.osmowsis.LawnMower --> com.osmowsis.Action : creates
 
-com.osmowsis.LawnMower "0..*" o-- "0..*" com.osmowsis.Point : knownlawn
+com.osmowsis.LawnMower "1" o-- "1" com.osmowsis.SharedLawn : knownlawn
 com.osmowsis.Main "1" *-- "1" com.osmowsis.Simulation : creates
+com.osmowsis.SharedLawn "1" *-- "1..*" com.osmowsis.Point : contains
 
 
 
