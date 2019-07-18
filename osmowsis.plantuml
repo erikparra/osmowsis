@@ -61,7 +61,9 @@ class com.osmowsis.Lawn {
     + setNumOfGrass( mowerCount: int )
     + renderLawn()
     + getScan( mower: LawnMower ): String
-    +  moveMower( mower: LawnMower, action: Action): String
+    + moveMower( mower: LawnMower, action: Action): String
+    + verifyAction(): boolean
+
     - checkLocation( p: Point ): LawnState
     - renderHorizontalBar( size: int)
     - findMower( mower: LawnMower ): Point
@@ -131,7 +133,8 @@ class com.osmowsis.Main {
 enum com.osmowsis.MowerState <<enumeration>> {
     crashed,
     running,
-    off
+    off,
+    stalled
 }
 
 class java.awt.Point {
@@ -183,6 +186,7 @@ com.osmowsis.LawnMower "1" o-- "1" com.osmowsis.SharedLawn : knownlawn
 com.osmowsis.Main "1" *-- "1" com.osmowsis.Simulation : creates
 com.osmowsis.SharedLawn "1" *-- "1..*" com.osmowsis.Point : contains
 
+com.osmowsis.Lawn "1..*" --> "1..*" com.osmowsis.Action : verifies
 
 
 @enduml

@@ -12,62 +12,72 @@ UML version 2
 end header
 
 
+loop Simulation.hasTurn() == True
+    activate Main
+    Main -> Simulation : Take Turn
+    loop for each Mower
 
-activate Simulation
-Simulation -> LawnMower: Get Action
-activate LawnMower
-LawnMower -> SharedLawn : Get Lawn details
-activate SharedLawn
-SharedLawn --> LawnMower : Lawn Details
-deactivate SharedLawn
-LawnMower --> Simulation: Action
-deactivate LawnMower
+        activate Simulation
+        Simulation -> LawnMower: Get Action
+        activate LawnMower
+        LawnMower -> SharedLawn : Get Lawn details
+        activate SharedLawn
+        SharedLawn --> LawnMower : Lawn Details
+        deactivate SharedLawn
+        LawnMower --> Simulation: Action
+        deactivate LawnMower
 
-alt Action == Scan
-    Simulation -> Lawn : Get Scan ( mowerLocation )
-    activate Lawn
-    Lawn --> Simulation : Scan Information
-    deactivate Lawn
-    Simulation -> LawnMower : Send Scan Information
-    activate LawnMower
-    LawnMower -> SharedLawn : Merge Scan Details
-    activate SharedLawn
-    deactivate SharedLawn
-    deactivate LawnMower
-else Action == Move
-    Simulation -> Lawn : Verify Action ( Action )
-    activate Lawn
-    Lawn --> Simulation : Action Response
-    deactivate Lawn
+        alt Action == Scan
+            Simulation -> Lawn : Get Scan ( mowerLocation )
+            activate Lawn
+            Lawn --> Simulation : Scan Information
+            deactivate Lawn
+            Simulation -> LawnMower : Send Scan Information
+            activate LawnMower
+            LawnMower -> SharedLawn : Merge Scan Details
+            activate SharedLawn
+            deactivate SharedLawn
+            deactivate LawnMower
+        else Action == Move
+            Simulation -> Lawn : Verify Action ( Action )
+            activate Lawn
+            Lawn --> Simulation : Action Response
+            deactivate Lawn
 
-    alt Action Response == ok
-        Simulation -> LawnMower : Update Mower( Location, Status )
-        activate LawnMower
-        LawnMower -> SharedLawn : Update SharedLawn( Mower )
-        activate SharedLawn
-        deactivate SharedLawn
-        deactivate LawnMower
-        Simulation -> Lawn : Update Location ( mower )
-        activate Lawn
-        deactivate Lawn
-    else Action Response == crash
-        Simulation -> LawnMower : Update Mower( Disable )
-        activate LawnMower
-        LawnMower -> SharedLawn : Update SharedLawn( Mower )
-        activate SharedLawn
-        deactivate SharedLawn
-        deactivate LawnMower
-    else Action Response == stall
-        Simulation -> LawnMower : Update Mower( Stall )
-        activate LawnMower
-        LawnMower -> SharedLawn : Update SharedLawn( Mower )
-        activate SharedLawn
-        deactivate SharedLawn
-        deactivate LawnMower
-        Simulation -> Lawn : Update Location ( mower )
-        activate Lawn
-        deactivate Lawn
+            alt Action Response == ok
+                Simulation -> LawnMower : Update Mower( Location, Status )
+                activate LawnMower
+                LawnMower -> SharedLawn : Update SharedLawn( Mower )
+                activate SharedLawn
+                deactivate SharedLawn
+                deactivate LawnMower
+                Simulation -> Lawn : Update Location ( mower )
+                activate Lawn
+                deactivate Lawn
+            else Action Response == crash
+                Simulation -> LawnMower : Update Mower( Disable )
+                activate LawnMower
+                LawnMower -> SharedLawn : Update SharedLawn( Mower )
+                activate SharedLawn
+                deactivate SharedLawn
+                deactivate LawnMower
+            else Action Response == stall
+                Simulation -> LawnMower : Update Mower( Stall )
+                activate LawnMower
+                LawnMower -> SharedLawn : Update SharedLawn( Mower )
+                activate SharedLawn
+                deactivate SharedLawn
+                deactivate LawnMower
+                Simulation -> Lawn : Update Location ( mower )
+                activate Lawn
+                deactivate Lawn
+            end
+        end
     end
+
+    Simulation --> Main : Turn Complete
+    deactivate Simulation
+    deactivate Main
 end
 
 @enduml
