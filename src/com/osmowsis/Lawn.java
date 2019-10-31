@@ -2,8 +2,6 @@ package com.osmowsis;
 
 import com.osmowsis.*;
 
-import java.awt.*;
-
 public class Lawn {
     private LawnSquare[][] lawn;
     private int width;
@@ -20,6 +18,12 @@ public class Lawn {
             }
         }
     }
+
+    // ** FOR UI STUFF
+    public LawnSquare[][] getState(){
+        return lawn.clone();
+    }
+    // **
 
     public int getNumberOfSquares(){
         return this.width * this.height;
@@ -40,8 +44,9 @@ public class Lawn {
         return this.numberOfGrass - count;
     }
 
-    public void addMower( int x, int y, int id ){
-        lawn[x][y] = new LawnSquareMower( LawnState.mower, id);
+    public void setMower( int x, int y, int id, Direction d ){
+        //lawn[x][y] = new LawnSquareMower( LawnState.mower, id);
+        lawn[x][y] = new LawnSquareMower( LawnState.energymower, id, d);
     }
 
     public void addCrater( int x, int y ){
@@ -56,7 +61,9 @@ public class Lawn {
                     count++;
             }
         }
-        this.numberOfGrass = count+mowerCount;
+        //does the original mower location still contain grass? or just charging pad?
+        //this.numberOfGrass = count+mowerCount;
+        this.numberOfGrass = count;
     }
 
 
@@ -74,8 +81,13 @@ public class Lawn {
             // display the contents of each square on this row
             for (int x = 0; x < width; x++) {
                 System.out.print(" | ");
-
-                System.out.print( lawn[x][y].getState().toString().charAt(0));
+                LawnState ls = lawn[x][y].getState();
+                if( ls == LawnState.energymower ){
+                    System.out.print( 'm' );
+                }
+                else{
+                    System.out.print( lawn[x][y].getState().toString().charAt(0));
+                }
             }
             System.out.println(" |");
         }
@@ -98,47 +110,115 @@ public class Lawn {
         String scanResults = "";
         Point loc = findMower( mower );
 
-        //todo: if scan outisde boundry, return fence state
+        //if scan outisde boundry, return fence state
 
 
         //north
-        scanResults += checkLocation( new Point(loc, Direction.north)).toString() + ",";
+        scanResults += checkLocationAsString( new Point(loc, Direction.north)) + ",";
 
         //northeast
-        scanResults += checkLocation( new Point(loc, Direction.northeast)).toString() + ",";
+        scanResults += checkLocationAsString( new Point(loc, Direction.northeast)) + ",";
 
         //east
-        scanResults += checkLocation( new Point(loc, Direction.east)).toString() + ",";
+        scanResults += checkLocationAsString( new Point(loc, Direction.east)) + ",";
 
         //southeast
-        scanResults += checkLocation( new Point(loc, Direction.southeast)).toString() + ",";
+        scanResults += checkLocationAsString( new Point(loc, Direction.southeast)) + ",";
 
         //south
-        scanResults += checkLocation( new Point(loc, Direction.south)).toString() + ",";
+        scanResults += checkLocationAsString( new Point(loc, Direction.south)) + ",";
 
         //southwest
-        scanResults += checkLocation( new Point(loc, Direction.southwest)).toString() + ",";
+        scanResults += checkLocationAsString( new Point(loc, Direction.southwest)) + ",";
 
         //west
-        scanResults += checkLocation( new Point(loc, Direction.west)).toString() + ",";
+        scanResults += checkLocationAsString( new Point(loc, Direction.west)) + ",";
 
         //northwest
-        scanResults += checkLocation( new Point(loc, Direction.northwest)).toString();
+        scanResults += checkLocationAsString( new Point(loc, Direction.northwest));
 
         return scanResults;
 
     }
 
+
     /**
      *
      */
-    public String moveMower(LawnMower mower, Action action) {
-        //todo: check direction move for collision
+    public String validateMove( LawnMower mower, Action action ){
+        Point origPos = findMower( mower );
+        LawnState origState = checkLocation(origPos);
+
+        if( action.getSteps() >= 1 ){
+            Point nextPos = new Point(origPos, action.getDirection());
+            LawnState nextState = checkLocation(nextPos);
+
+            switch( nextState ){
+                case crater:
+                case fence:
+                    moveMower(mower, action);
+                    return "crash";
+                case energymower:
+                case mower:
+                    return "stall,"+action.getSteps();
+                case grass:
+                case empty:
+                case energy:
+                    moveMower( mower, action);
+                    return "ok";
+                default:
+                    return "UNKNOWN";
+            }
+        }
+        else{
+            //rotate mower
+            lawn[origPos.x][origPos.y] = new LawnSquareMower(origState, mower.getId(), action.getDirection());
+            return "ok";
+        }
+    }
+
+
+    public void moveMower( LawnMower mower, Action action ){
+        Point origPos = findMower( mower );
+        LawnState origState = checkLocation(origPos);
+
+        Point nextPos = new Point(origPos, action.getDirection());
+        LawnState nextState = checkLocation(nextPos);
+
+        if( origState == LawnState.energymower ){
+            lawn[origPos.x][origPos.y] = new LawnSquare( LawnState.energy );
+        }
+        else{
+            lawn[origPos.x][origPos.y] = new LawnSquare( LawnState.empty );
+        }
+
+        switch( nextState ){
+            case crater:
+                break;
+            case fence:
+                break;
+            //case energyMower:  //will never be called for these values
+            //case mower:
+            case grass:
+            case empty:
+                lawn[nextPos.x][nextPos.y] = new LawnSquareMower( LawnState.mower, mower.getId(), mower.getDirection() );
+                break;
+            case energy:
+                lawn[nextPos.x][nextPos.y] = new LawnSquareMower( LawnState.energymower, mower.getId(), mower.getDirection() );
+                break;
+            default:
+                return;
+        }
+    }
+
+    /**
+
+    public String moveMower_OLD(LawnMower mower, Action action) {
         Point originalPos = findMower(mower);
+        LawnState originalState = lawn[originalPos.x][originalPos.y].getState();
         Point currentPos = originalPos;
         switch (mower.getDirection()) {
             case north:
-                //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
                     Point nextPos = new Point(currentPos.x, currentPos.y + i);
                     LawnState nextState = checkLocation(nextPos);
@@ -154,7 +234,6 @@ public class Lawn {
                 }
                 return "ok";
             case northeast:
-                //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
                     Point nextPos = new Point(currentPos.x + i, currentPos.y + i);
                     LawnState nextState = checkLocation(nextPos);
@@ -170,7 +249,6 @@ public class Lawn {
                 }
                 return "ok";
             case east:
-                //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
                     Point nextPos = new Point(currentPos.x + i, currentPos.y);
                     LawnState nextState = checkLocation(nextPos);
@@ -186,7 +264,6 @@ public class Lawn {
                 }
                 return "ok";
             case southeast:
-                //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
                     Point nextPos = new Point(currentPos.x + 1, currentPos.y - i);
                     LawnState nextState = checkLocation(nextPos);
@@ -202,7 +279,6 @@ public class Lawn {
                 }
                 return "ok";
             case south:
-                //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
                     Point nextPos = new Point(currentPos.x, currentPos.y - i);
                     LawnState nextState = checkLocation(nextPos);
@@ -218,7 +294,6 @@ public class Lawn {
                 }
                 return "ok";
             case southwest:
-                //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
                     Point nextPos = new Point(currentPos.x - i, currentPos.y - i);
                     LawnState nextState = checkLocation(nextPos);
@@ -234,7 +309,6 @@ public class Lawn {
                 }
                 return "ok";
             case west:
-                //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
                     Point nextPos = new Point(currentPos.x - i, currentPos.y);
                     LawnState nextState = checkLocation(nextPos);
@@ -250,7 +324,6 @@ public class Lawn {
                 }
                 return "ok";
             case northwest:
-                //todo: check step != mower,crater,fence
                 for (int i = 1; i <= action.getSteps(); i++) {
                     Point nextPos = new Point(currentPos.x - i, currentPos.y + i);
                     LawnState nextState = checkLocation(nextPos);
@@ -269,6 +342,8 @@ public class Lawn {
                 return "Lawn - moveMower() - switch default";
         }
     }
+    */
+
 
     /**
      * return the state at the lawn location
@@ -285,7 +360,16 @@ public class Lawn {
         }
     }
 
-
+    private String checkLocationAsString( Point p ){
+        LawnState ls = checkLocation( p );
+        if( ls == LawnState.mower || ls == LawnState.energymower ){
+            LawnSquareMower lsm = (LawnSquareMower) lawn[p.x][p.y];
+            return "mower_"+lsm.getId();
+        }
+        else{
+            return ls.toString();
+        }
+    }
 
     private void renderHorizontalBar(int size) {
         for (int k = 0; k < size; k++) {
@@ -298,10 +382,10 @@ public class Lawn {
      * find the current location of the mower on the lawn
      * @return Point location of mower
      */
-    private Point findMower( LawnMower mower){
+    public Point findMower( LawnMower mower){
         for( int x = 0; x < lawn.length; x++ ){
             for( int y = 0; y < lawn[0].length; y++ ){
-                if( lawn[x][y].getState() == LawnState.mower ){
+                if( lawn[x][y].getState() == LawnState.mower || lawn[x][y].getState() == LawnState.energymower ){
                     LawnSquareMower mowerSquare = (LawnSquareMower) lawn[x][y];
                     if( mowerSquare.getId() == mower.getId() ){
                         return new Point(x, y);
@@ -311,5 +395,4 @@ public class Lawn {
         }
         return null;
     }
-
 }

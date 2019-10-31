@@ -1,0 +1,192 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+'hide circle
+
+title __OSMOWSIS Class Diagram__\n
+
+center header
+Name: Erik Parra
+Assignment: #4
+UML version 2
+end header
+
+class com.osmowsis.Action {
+    - state: ActionState
+    - steps: int
+    - direction: Direction
+
+    + Action( state: ActionState)
+    + Action( state: ActionState, steps: int, direction: Direction)
+    + getState(): ActionState
+    + getSteps(): int
+    + getDirection(): Direction
+    + toString(): String
+}
+
+enum com.osmowsis.ActionState <<enumeration>> {
+    move
+    scan
+    crash
+    unknown
+    empty
+}
+
+enum com.osmowsis.Direction <<enumeration>> {
+    north: 0
+    northeast: 1
+    east: 2
+    southeast: 3
+    south: 4
+    southwest: 5
+    west: 6
+    northwest: 7
+    - value: int
+
+    - Direction( int )
+    + getValue(): int
+}
+
+class com.osmowsis.Lawn {
+    - lawn: LawnSquare[][]
+    - width: int
+    - height: int
+    - numberOfGrass: int
+    + Lawn( width: int, height: int  )
+    + getNumberOfSquares(): int
+    + getNumberOfGrass(): int
+    + getNumberOfGrassCut(): int
+    + addMower( x: int, y: int, id: int )
+    + addCrater( x: int, y: int )
+    + setNumOfGrass( mowerCount: int )
+    + renderLawn()
+    + getScan( mower: LawnMower ): String
+    + moveMower( mower: LawnMower, action: Action): String
+    + verifyAction(): boolean
+
+    - checkLocation( p: Point ): LawnState
+    - renderHorizontalBar( size: int)
+    - findMower( mower: LawnMower ): Point
+}
+
+
+class com.osmowsis.LawnMower {
+
+    - id: int
+    - direction: Direction
+    - state: MowerState
+    - currentLocation: Point
+    - knownlawn: SharedLawn
+    - numberOfMowers: int
+    - energyLevel: int
+
+    + LawnMower( id: int, dir: Direction, mowerCount: int)
+    + getDirection(): Direction
+    + getState(): MowerState
+    + getId(): int
+    + getAction(): Action
+    + setScan()
+    + printLawn()
+    - isLawnComplete(): boolean
+    - checkLocation(p: Point): LawnState
+    - moveCurrentDirection(): Action
+    - getNewDirection(): Action
+    - degreeToDirection( degrees: double): Direction
+    - getAdjacentDirection( d: Direction): Direction[]
+    - checkNextAdjacentPoint( nextD: Direction, leftD: Direction, rightD: Direction, which: int): Direction
+    - directionTowardPoint( destPoint: Point): Action
+    - getMissingAreaPoint(): Point
+    - getBottomLeftPoint(): Point
+    - getTopRightPoint(): Point
+    - getFirstGrassPoint(): Point
+    - surroundingSpacesScanned(): boolean
+}
+
+
+class com.osmowsis.LawnSquare {
+    - state: LawnState
+    + LawnSquare( ls: LawnState )
+    + getState(): LawnState
+    + setState( ls: LawnState )
+}
+
+
+class com.osmowsis.LawnSquareMower {
+    - id: int
+    + LawnSquareMower( ls: LawnState, id: int )
+    + getId(): int
+    + setId( id: int )
+}
+
+enum com.osmowsis.LawnState <<enumeration>> {
+    grass
+    crater
+    mower
+    empty
+    fence
+    charger
+}
+
+class com.osmowsis.Main {
+}
+
+enum com.osmowsis.MowerState <<enumeration>> {
+    crashed,
+    running,
+    off,
+    stalled
+}
+
+class java.awt.Point {
+    + x: int
+    + y: int
+}
+
+
+class com.osmowsis.Point {
+    + Point( x: int, y: int )
+    + Point( p: Point )
+    + Point( p: Point, direction: Direction )
+}
+
+
+class com.osmowsis.Simulation {
+    - {static} DEFAULT_MAX_SIZE: int
+    - lawn: Lawn
+    - mowers: ArrayList<LawnMower>
+    - maxTurns: int
+    - numOfTurns: int
+    - numofMowers: int
+
+    + Simulation()
+    + hasTurn(): boolean
+    + loadStartingFile( testFileName: String )
+    + takeTurn()
+    + printResults()
+    - sendScanToMower( mower: LawnMower ): String
+}
+
+class com.osmowsis.SharedLawn <<Singleton>>{
+    - lawn: HashMap<Point, LawnState>
+    - mowerLawns: ArrayList<HashMap<Point, LawnState>>
+    + addData( mower: LawnMower, data: String )
+    + getLawn( id: int ): HashMap<Point, LawnState>
+    - meregeData()
+}
+
+
+com.osmowsis.Simulation "1" *-- "1" com.osmowsis.Lawn  : contains
+com.osmowsis.Simulation "1" *-- "1..*" com.osmowsis.LawnMower  : contains
+com.osmowsis.Lawn "1" *-- "1..*" com.osmowsis.LawnSquare : contains
+com.osmowsis.LawnSquareMower -up-|> com.osmowsis.LawnSquare
+com.osmowsis.Point -up-|> java.awt.Point
+com.osmowsis.LawnMower --> com.osmowsis.Action : creates
+
+com.osmowsis.LawnMower "1" o-- "1" com.osmowsis.SharedLawn : knownlawn
+com.osmowsis.Main "1" *-- "1" com.osmowsis.Simulation : creates
+com.osmowsis.SharedLawn "1" *-- "1..*" com.osmowsis.Point : contains
+
+com.osmowsis.Lawn "1..*" --> "1..*" com.osmowsis.Action : verifies
+
+
+@enduml

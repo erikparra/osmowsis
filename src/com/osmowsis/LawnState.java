@@ -8,5 +8,7 @@ enum LawnState {
     crater,
     mower,
     empty,
-    fence
+    fence,
+    energy,
+    energymower
 }
