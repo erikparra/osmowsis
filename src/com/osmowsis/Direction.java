@@ -19,4 +19,25 @@ public enum Direction {
     public int getValue(){
         return this.value;
     }
+
+    public String toSimpleString(){
+        if(this.toString().equalsIgnoreCase("north"))
+            return "N";
+        else if(this.toString().equalsIgnoreCase("northeast"))
+            return "NE";
+        else if(this.toString().equalsIgnoreCase("east"))
+            return "E";
+        else if(this.toString().equalsIgnoreCase("southeast"))
+            return "SE";
+        else if(this.toString().equalsIgnoreCase("south"))
+            return "S";
+        else if(this.toString().equalsIgnoreCase("southwest"))
+            return "SW";
+        else if(this.toString().equalsIgnoreCase("west"))
+            return "W";
+        else if(this.toString().equalsIgnoreCase("northwest"))
+            return "NW";
+        else
+            return "X";
+    }
 }

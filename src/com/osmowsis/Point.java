@@ -51,4 +51,10 @@ public class Point extends java.awt.Point {
                 break;
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        Point other = (Point) obj;
+        return (this.x == other.x && this.y == other.y);
+    }
 }

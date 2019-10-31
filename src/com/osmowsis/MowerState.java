@@ -3,5 +3,6 @@ package com.osmowsis;
 enum MowerState {
     crashed,
     running,
-    off
+    off,
+    stalled
 }
